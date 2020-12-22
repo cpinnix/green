@@ -6,7 +6,7 @@
   "author": "Charles Pinnix <cpinnix89@gmail.com>",
   "license": "MIT",
   "scripts": {
-    "load": "node etl/cmd/load"
+    "load": "node cmd/load"
   },
   "dependencies": {
     "csv-parse": "^4.14.2",
