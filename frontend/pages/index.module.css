@@ -1,0 +1,14 @@
+.rows {
+  display: grid;
+  gap: 1rem;
+  margin-bottom: 8rem;
+}
+
+.row {
+  height: 32px;
+  align-items: center;
+  display: grid;
+  gap: 2rem;
+  grid-template-columns: 2rem 16rem 6rem 4rem 8rem auto;
+  padding-left: 1rem;
+}
