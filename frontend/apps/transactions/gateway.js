@@ -1,5 +1,5 @@
-export function fetchTransactions() {
-  return fetch("//localhost:4000", {
+export async function fetchTransactions() {
+  const response = await fetch("//localhost:4000", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
@@ -14,4 +14,24 @@ export function fetchTransactions() {
           }`,
     }),
   }).then((response) => response.json());
+
+  return response?.data?.transactions;
+}
+
+export async function fetchTaggedExpressions() {
+  const response = await fetch("//localhost:4000", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      query: `
+          query {
+            taggedExpressions {
+              regex
+              tag
+            }
+          }`,
+    }),
+  }).then((response) => response.json());
+
+  return response?.data?.taggedExpressions;
 }
