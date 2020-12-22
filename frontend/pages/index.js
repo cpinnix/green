@@ -1,6 +1,5 @@
+import React from "react";
 import Head from "next/head";
-// import uniqBy from "lodash/uniqBy";
-// import uniq from "lodash/uniq";
 import sum from "lodash/sum";
 import { format } from "date-fns";
 import { List, AutoSizer } from "react-virtualized";
@@ -10,23 +9,6 @@ import createInteractors from "apps/transactions";
 import { MONTH_OPTIONS } from "apps/transactions/constants";
 import classes from "./index.module.css";
 import { useEffect } from "react";
-
-// const transactions = uniqBy(data, (transaction) => transaction.hash)
-//   .filter((transaction) => transaction.tag !== "transfer")
-//   .map((transaction) => ({
-//     ...transaction,
-//     description:
-//       transaction.description.length > 64
-//         ? transaction.description.slice(0, 64) + " ..."
-//         : transaction.description,
-//   }));
-
-// const tags = [
-//   "",
-//   ...uniq(transactions.map((transaction) => transaction.tag)).filter(
-//     (tag) => tag
-//   ),
-// ];
 
 function present(interactors) {
   const { state, actions, selectors } = interactors.transactions;
@@ -69,7 +51,7 @@ export default function IndexPage() {
       filteredTransactions,
       overrides,
     },
-    actions: { changeQuery, changeTag, changeMonth, changeDescription, search },
+    actions: { changeQuery, changeTag, changeMonth, changeDescription },
   } = presentation;
 
   const transactions = filteredTransactions;
@@ -114,7 +96,6 @@ export default function IndexPage() {
       <Head>
         <title>Green</title>
         <link rel="icon" href="/favicon.ico" />
-        <body style={{ backgroundColor: "black" }} />
       </Head>
       <div className="container mx-auto px-8 flex flex-col h-full">
         <div className="flex mt-16 mb-8">
@@ -192,36 +173,3 @@ export default function IndexPage() {
     </div>
   );
 }
-
-// import { useEffect } from "react";
-// import Head from "next/head";
-
-// export default function Home() {
-//   useEffect(() => {
-//     fetch("//localhost:4000", {
-//       method: "POST",
-//       headers: { "Content-Type": "application/json" },
-//       body: JSON.stringify({
-//         query: `
-//           query {
-//             transactions {
-//               date
-//               amount
-//               description
-//               hash
-//             }
-//           }`,
-//       }),
-//     });
-//   }, []);
-
-//   return (
-//     <div>
-// <Head>
-//   <title>Green</title>
-//   <link rel="icon" href="/favicon.ico" />
-// </Head>
-//       <div>Hello World</div>
-//     </div>
-//   );
-// }
