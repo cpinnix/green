@@ -10,8 +10,14 @@ const typeDefs = gql`
     hash: String
   }
 
+  type TaggedExpression {
+    regex: String
+    tag: String
+  }
+
   type Query {
     transactions: [Transaction]
+    taggedExpressions: [TaggedExpression]
   }
 `;
 
@@ -19,6 +25,11 @@ const resolvers = {
   Query: {
     transactions: async function () {
       return JSON.parse(fs.readFileSync(output.transactions.json));
+    },
+    taggedExpressions: async function () {
+      return JSON.parse(
+        fs.readFileSync("../green-tags.json")
+      ).map(([regex, tag]) => ({ regex, tag }));
     },
   },
 };
