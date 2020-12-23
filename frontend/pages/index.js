@@ -1,14 +1,16 @@
-import React from "react";
+import React, { useEffect } from "react";
 import Head from "next/head";
+import Link from "next/link";
 import sum from "lodash/sum";
 import { format } from "date-fns";
 import { List, AutoSizer } from "react-virtualized";
 import useInteractors from "hooks/useInteractors";
-import log from "utils/log";
+import createLogger from "utils/createLogger";
 import createInteractors from "apps/transactions";
 import { MONTH_OPTIONS } from "apps/transactions/constants";
 import classes from "./index.module.css";
-import { useEffect } from "react";
+
+const log = createLogger("#82B1FF", "[HOME]");
 
 function present(interactors) {
   const { state, actions, selectors } = interactors.transactions;
@@ -32,7 +34,7 @@ function present(interactors) {
   return presentation;
 }
 
-export default function IndexPage() {
+export default function Page() {
   const interactors = useInteractors(() => createInteractors());
 
   useEffect(() => {
@@ -97,6 +99,9 @@ export default function IndexPage() {
         <title>Green</title>
         <link rel="icon" href="/favicon.ico" />
       </Head>
+      <Link href="/trends">
+        <a className="text-white">Trends</a>
+      </Link>
       <div className="container mx-auto px-8 flex flex-col h-full">
         <div className="flex mt-16 mb-8">
           <input

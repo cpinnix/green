@@ -1,9 +1,33 @@
 import uniqBy from "lodash/uniqBy";
 import uniq from "lodash/uniq";
-import log from "utils/log";
+import createLogger from "utils/createLogger";
 
-export function initiate({ store, gateway }) {
+const log = createLogger("#B388FF", "[TRANSACTIONS]");
+
+export function initiate({
+  store,
+  gateway,
+  memoryStorage,
+  localStorage,
+  unsubscribe,
+}) {
   return async function initiate() {
+    const [overrides, storedState] = await Promise.all([
+      localStorage.selectors.get("transactions.overrides"),
+      memoryStorage.selectors.get("transactions.state"),
+    ]);
+
+    unsubscribe = store.subscribe(function handleStateChange(state) {
+      localStorage.actions.set("transactions.overrides", state.overrides);
+      memoryStorage.actions.set("transactions.state", state);
+    });
+
+    store.setState({
+      ...store.getState(),
+      ...storedState,
+      overrides,
+    });
+
     const [transactions, taggedExpressions] = await Promise.all([
       gateway.fetchTransactions(),
       gateway.fetchTaggedExpressions(),
@@ -46,13 +70,13 @@ export function initiate({ store, gateway }) {
       ).filter((tag) => tag),
     ];
 
-    const storedOverrides = localStorage.getItem("overrides");
+    // const storedOverrides = localStorage.getItem("overrides");
 
     store.setState({
       ...store.getState(),
       transactions: decoratedTransactions,
       tags,
-      ...(storedOverrides || {}),
+      // ...(storedOverrides || {}),
     });
   };
 }

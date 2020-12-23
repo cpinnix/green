@@ -1,6 +1,9 @@
 import createStore from "bones/createStore";
 import * as actions from "./actions";
 import * as selectors from "./selectors";
+import createLogger from "utils/createLogger";
+
+const log = createLogger("#B388FF", "[TRANSACTIONS]");
 
 const DEFAULT_STATE = {
   query: "",
@@ -12,20 +15,29 @@ const DEFAULT_STATE = {
   overrides: {},
 };
 
-export default function createInteractor({ gateway }) {
+export default function createInteractor({
+  gateway,
+  localStorage,
+  memoryStorage,
+}) {
   const store = createStore(DEFAULT_STATE);
 
-  const unsubscribe = store.subscribe(function handleStateChange(state) {
-    localStorage.setItem("overrides", JSON.stringify(state.overrides));
-  });
+  let unsubscribe;
 
   return {
     ...store,
     destroy() {
-      unsubscribe();
+      unsubscribe?.();
+      log("destroyed");
     },
     actions: {
-      initiate: actions.initiate({ store, gateway }),
+      initiate: actions.initiate({
+        store,
+        gateway,
+        localStorage,
+        memoryStorage,
+        unsubscribe,
+      }),
       changeQuery: actions.changeQuery({ store }),
       changeTag: actions.changeTag({ store }),
       changeMonth: actions.changeMonth({ store }),
