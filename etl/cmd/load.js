@@ -20,7 +20,7 @@ function parseFile(transformerName, path) {
   return new Promise((resolve) => {
     const transformer = require(`../transformers/${transformerName}`);
 
-    const rows = [];
+    const table = [];
 
     const parser = parse({
       delimiter: ",",
@@ -32,10 +32,10 @@ function parseFile(transformerName, path) {
       while ((record = parser.read())) {
         const row = transformer(record, path);
         if (!row[0]) {
-          logger.debug("dropped row", row);
+          logger.debug("dropped row %j", row);
         } else {
-          logger.debug("transformed row", row);
-          rows.push(row);
+          logger.debug("transformed row %j", row);
+          table.push(row);
         }
       }
     });
@@ -45,8 +45,8 @@ function parseFile(transformerName, path) {
     });
 
     parser.on("end", () => {
-      logger.info(`parsed ${rows.length} rows in ${path}`);
-      resolve(rows);
+      logger.info(`parsed ${table.length} rows in ${path}`);
+      resolve(table);
     });
 
     const file = fs.readFileSync(path);
@@ -61,27 +61,27 @@ const filePaths = input.folders
 
 logger.debug("filePaths", filePaths);
 
-const promises = filePaths.map((path) => {
-  const transformerNames = Object.keys(transformers);
-  const transformerForPath = transformerNames.find((name) =>
-    path.includes(name)
-  );
+Promise.all(
+  filePaths.map((path) => {
+    const transformerNames = Object.keys(transformers);
+    const transformerForPath = transformerNames.find((name) =>
+      path.includes(name)
+    );
 
-  if (!transformerForPath) {
-    throw new Error(`No transformer found for: ${path}`);
-    return [];
-  }
+    if (!transformerForPath) {
+      throw new Error(`No transformer found for: ${path}`);
+      return [];
+    }
 
-  return parseFile(transformers[transformerForPath], path);
-});
-
-Promise.all(promises).then((res) => {
-  const rows = res
+    return parseFile(transformers[transformerForPath], path);
+  })
+).then((tables) => {
+  const mergedTable = tables
     .reduce((acc, val) => [...acc, ...val], [])
     .filter((item) => item[0] !== "")
     .sort((a, b) => moment(a[0]).diff(moment(b[0])));
 
-  const json = rows.map(([date, amount, description, hash]) => ({
+  const json = mergedTable.map(([date, amount, description, hash]) => ({
     date,
     amount,
     description,
@@ -89,7 +89,7 @@ Promise.all(promises).then((res) => {
   }));
   fs.writeFileSync(output.transactions.json, JSON.stringify(json));
 
-  stringify(rows, (err, data) => {
+  stringify(mergedTable, (err, data) => {
     if (err) logger.error("while stringifying to csv", err);
     fs.writeFileSync(output.transactions.csv, data);
   });
