@@ -1,8 +1,11 @@
 import React from "react";
 import Link from "next/link";
+import { useRouter } from "next/router";
 import classes from "./index.module.css";
 
 export default function Navigation() {
+  const router = useRouter();
+
   return (
     <div className={classes.layout}>
       <div className="text-xl">🤑</div>
@@ -16,11 +19,7 @@ export default function Navigation() {
             ml-4
             focus:outline-none
             focus:text-blue-500
-            ${
-              window && window.location.pathname === "/"
-                ? "text-yellow-200"
-                : ""
-            }
+            ${router.pathname === "/" ? "text-yellow-200" : ""}
           `}
         >
           Transactions
@@ -35,11 +34,7 @@ export default function Navigation() {
             ml-4
             focus:outline-none
             focus:text-blue-500
-            ${
-              window && window.location.pathname.includes("/trends")
-                ? "text-yellow-200"
-                : ""
-            }
+            ${router.pathname.includes("/trends") ? "text-yellow-200" : ""}
           `}
         >
           Summary
