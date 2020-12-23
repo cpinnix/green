@@ -3,6 +3,15 @@
   align-items: center;
   display: grid;
   gap: 2rem;
-  grid-template-columns: auto 4rem;
+  grid-template-columns: min-content auto;
   @apply px-4;
+}
+
+.transaction {
+  height: 32px;
+  align-items: center;
+  display: grid;
+  gap: 2rem;
+  grid-template-columns: 2rem 16rem 6rem 4rem 8rem auto;
+  padding-left: 1rem;
 }

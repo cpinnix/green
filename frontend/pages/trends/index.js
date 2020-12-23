@@ -1,101 +1,116 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import Head from "next/head";
 import useInteractors from "hooks/useInteractors";
 import createInteractors from "apps/transactions";
 import createLogger from "utils/createLogger";
-import set from "date-fns/set";
 import getYear from "date-fns/getYear";
 import getMonth from "date-fns/getMonth";
-import toPairs from "lodash/toPairs";
+import uniq from "lodash/uniq";
+import sumBy from "lodash/sumBy";
 import { MONTH_OPTIONS } from "apps/transactions/constants";
 import Navigation from "components/Navigation";
+import accounting from "utils/accounting";
+import { format } from "date-fns";
 import classes from "./index.module.css";
 
 const log = createLogger("#82B1FF", "[TRENDS]");
 
-function monthlySummaries({ state, selectors }) {
-  if (state.transactions.length === 0) return [];
-
-  const startStamp = performance.now();
-
-  const transactions = selectors.filteredTransactions(state);
-
-  const startTimes = [
-    ...Array.apply(null, new Array(12)).map((_, index) =>
-      set(new Date(), {
-        year: 2020,
-        month: index,
-        date: 1,
-        hour: 0,
-        minutes: 0,
-        seconds: 0,
-      })
-    ),
-    set(new Date(), {
-      year: 2021,
-      month: 0,
-      date: 1,
-      hour: 0,
-      minutes: 0,
-      seconds: 0,
-    }),
-  ];
-
-  let trends = transactions
-    .reduce((acc, transaction) => {
-      const index = startTimes.findIndex((start) => {
-        const date = transaction.date;
-        return (
-          getYear(date) === getYear(start) && getMonth(date) === getMonth(start)
-        );
-      });
-
-      if (!acc[index]) {
-        acc[index] = { transactions: [], tags: {} };
-      }
-
-      acc[index].transactions.push(transaction);
-
-      if (!acc[index].tags[transaction.tag]) {
-        acc[index].tags[transaction.tag] = 0;
-      }
-
-      acc[index].tags[transaction.tag] =
-        acc[index].tags[transaction.tag] + transaction.amount;
-
-      if (!acc[index].net) {
-        acc[index].net = 0;
-      }
-
-      acc[index].net = acc[index].net + transaction.amount;
-
-      return acc;
-    }, [])
-    .map((trend) => ({
-      ...trend,
-      tags: toPairs(trend.tags).sort((a, b) => b[1] - a[1]),
-    }));
-
-  const endStamp = performance.now();
-  log("performance - monthlySummaries", endStamp - startStamp);
-
-  return trends;
-}
-
 function present(interactors) {
+  let startStamp;
+  if (typeof performance !== "undefined") {
+    startStamp = performance.now();
+  }
+
   log("interactors", interactors);
 
-  const { state, selectors } = interactors.transactions;
+  const transactions = interactors.transactions.selectors.filteredTransactions(
+    interactors.transactions.state
+  );
+
+  const years = uniq(
+    transactions.map((transaction) => getYear(transaction.date))
+  );
+
+  const months = uniq(
+    transactions.map((transaction) => getMonth(transaction.date))
+  );
+
+  const tags = uniq(transactions.map((transaction) => transaction.tag));
 
   const presentation = {
     state: {
-      trends: monthlySummaries(interactors.transactions),
+      loading: interactors.transactions.state.transactions.length === 0,
+      years,
+      months,
+      tags,
+    },
+    selectors: {
+      net(year, month, tag) {
+        let filteredTransactions = transactions;
+
+        if (year !== null && year !== undefined) {
+          filteredTransactions = filteredTransactions.filter(
+            (transaction) => getYear(transaction.date) === year
+          );
+        }
+
+        if (month !== null && month !== undefined) {
+          filteredTransactions = filteredTransactions.filter(
+            (transaction) => getMonth(transaction.date) === month
+          );
+        }
+
+        if (tag !== null && tag !== undefined) {
+          filteredTransactions = filteredTransactions.filter(
+            (transaction) => transaction.tag === tag
+          );
+        }
+
+        return sumBy(filteredTransactions, (transaction) => transaction.amount);
+      },
+      transactions(year, month, tag) {
+        let filteredTransactions = transactions;
+
+        if (year !== null && year !== undefined) {
+          filteredTransactions = filteredTransactions.filter(
+            (transaction) => getYear(transaction.date) === year
+          );
+        }
+
+        if (month !== null && month !== undefined) {
+          filteredTransactions = filteredTransactions.filter(
+            (transaction) => getMonth(transaction.date) === month
+          );
+        }
+
+        if (tag !== null && tag !== undefined) {
+          filteredTransactions = filteredTransactions.filter(
+            (transaction) => transaction.tag === tag
+          );
+        }
+
+        return filteredTransactions;
+      },
     },
   };
 
   log("presentation", presentation);
 
+  if (typeof performance !== "undefined") {
+    log("performance - present", performance.now() - startStamp);
+  }
+
   return presentation;
+}
+
+function formatCurrency(amount) {
+  return accounting.formatColumn([amount, 1000000.0], {
+    format: {
+      pos: "%s %v", // for positive values, eg. "$ 1.00" (required)
+      neg: "%s -%v", // for negative values, eg. "$ (1.00)" [optional]
+      zero: "%s  -- ", // for zero values, eg. "$  --" [optional]
+    },
+  })[0];
 }
 
 export default function Page() {
@@ -105,8 +120,11 @@ export default function Page() {
     interactors.transactions.actions.initiate();
   }, []);
 
+  const [open, setOpen] = useState(null);
+
   const {
-    state: { trends },
+    state: { years, months, tags },
+    selectors: { net, transactions },
   } = present(interactors);
 
   return (
@@ -117,44 +135,199 @@ export default function Page() {
       </Head>
       <Navigation />
       <div className="p-8">
-        {trends &&
-          trends.map((trend, index) => (
-            <div key={index}>
-              <div className="font-mono text-xs text-white mb-4">
-                {MONTH_OPTIONS[index + 1]} 2020
-              </div>
+        {years.map((year) => {
+          const netYear = net(year);
+
+          return (
+            <div key={year}>
+              <div className="text-white font-mono text-xs mb-4">{year}</div>
               <div className="mb-8 border rounded border-white">
-                {trend.tags.map((tag) => (
-                  <div className={classes.row} key={tag[0]}>
-                    <div className="font-mono text-xs text-white">{tag[0]}</div>
-                    <div
-                      className={`font-mono text-xs ${
-                        tag[1] < 0 ? "text-red-500" : "text-green-500"
-                      }`}
-                    >
-                      {new Intl.NumberFormat("EN-US", {
-                        style: "currency",
-                        currency: "USD",
-                      }).format(tag[1])}
+                {tags.map((tag) => {
+                  const netTag = net(year, null, tag);
+                  return (
+                    <div key={tag}>
+                      <div
+                        className={`${classes.row} cursor-pointer`}
+                        onClick={() =>
+                          open && open[0] === year && open[2] === tag
+                            ? setOpen(null)
+                            : setOpen([year, null, tag])
+                        }
+                      >
+                        <div
+                          className={`font-mono text-xs whitespace-pre ${
+                            netTag < 0 ? "text-red-500" : "text-green-500"
+                          }`}
+                        >
+                          {formatCurrency(netTag)}
+                        </div>
+                        <div className="font-mono text-xs text-white">
+                          {tag}
+                        </div>
+                      </div>
+                      {open && open[0] === year && open[2] === tag && (
+                        <div className="border-t border-b border-white my-2 py-2">
+                          {transactions(year, null, tag).map(
+                            (transaction, index) => (
+                              <div
+                                key={transaction.hash}
+                                className={classes.transaction}
+                              >
+                                <div className="font-mono text-xs text-white">
+                                  {index}
+                                </div>
+                                <div className="font-mono text-xs text-white">
+                                  {transaction.hash}
+                                </div>
+                                <div className="font-mono text-xs text-white">
+                                  {format(
+                                    new Date(transaction.date),
+                                    "MMM dd yyyy"
+                                  )}
+                                </div>
+                                <div
+                                  className={`font-mono text-xs text-white ${
+                                    transaction.amount < 0
+                                      ? "text-red-500"
+                                      : "text-green-500"
+                                  }`}
+                                >
+                                  {new Intl.NumberFormat("EN-US", {
+                                    style: "currency",
+                                    currency: "USD",
+                                  }).format(transaction.amount)}
+                                </div>
+                                <div className="font-mono text-xs text-white">
+                                  {transaction.tag}
+                                </div>
+                                <div className="font-mono text-xs text-white">
+                                  {transaction.description}
+                                </div>
+                              </div>
+                            )
+                          )}
+                        </div>
+                      )}
                     </div>
-                  </div>
-                ))}
+                  );
+                })}
                 <div className={classes.row}>
-                  <div className="font-mono text-xs text-white">net</div>
                   <div
-                    className={`font-mono text-xs ${
-                      trend.net < 0 ? "text-red-500" : "text-green-500"
+                    className={`font-mono text-xs whitespace-pre ${
+                      netYear < 0 ? "text-red-500" : "text-green-500"
                     }`}
                   >
-                    {new Intl.NumberFormat("EN-US", {
-                      style: "currency",
-                      currency: "USD",
-                    }).format(trend.net)}
+                    {formatCurrency(netYear)}
                   </div>
+                  <div className="font-mono text-xs text-white">net</div>
                 </div>
               </div>
+              {months.map((month) => {
+                const netMonth = net(year, month);
+
+                return (
+                  <div key={month}>
+                    <div className="text-white font-mono text-xs mb-4">
+                      {MONTH_OPTIONS[month + 1]} {year}
+                    </div>
+                    <div className="mb-8 border rounded border-white">
+                      {tags.map((tag) => {
+                        const netTag = net(year, month, tag);
+                        const rows = transactions(year, month, tag);
+
+                        return (
+                          <div key={tag}>
+                            <div
+                              className={`${classes.row} ${
+                                rows.length > 0
+                                  ? "cursor-pointer hover:bg-gray-900"
+                                  : ""
+                              }`}
+                              onClick={() =>
+                                open &&
+                                open[0] === year &&
+                                open[1] === month &&
+                                open[2] === tag
+                                  ? setOpen(null)
+                                  : setOpen([year, month, tag])
+                              }
+                            >
+                              <div
+                                className={`font-mono text-xs whitespace-pre ${
+                                  netTag < 0 ? "text-red-500" : "text-green-500"
+                                }`}
+                              >
+                                {formatCurrency(netTag)}
+                              </div>{" "}
+                              <div className="font-mono text-xs text-white">
+                                {tag}
+                              </div>
+                            </div>
+                            {open &&
+                              open[0] === year &&
+                              open[1] === month &&
+                              open[2] === tag &&
+                              rows.length > 0 && (
+                                <div className="border-t border-b border-white my-2 py-2">
+                                  {rows.map((transaction, index) => (
+                                    <div
+                                      key={transaction.hash}
+                                      className={classes.transaction}
+                                    >
+                                      <div className="font-mono text-xs text-white">
+                                        {index}
+                                      </div>
+                                      <div className="font-mono text-xs text-white">
+                                        {transaction.hash}
+                                      </div>
+                                      <div className="font-mono text-xs text-white">
+                                        {format(
+                                          new Date(transaction.date),
+                                          "MMM dd yyyy"
+                                        )}
+                                      </div>
+                                      <div
+                                        className={`font-mono text-xs text-white ${
+                                          transaction.amount < 0
+                                            ? "text-red-500"
+                                            : "text-green-500"
+                                        }`}
+                                      >
+                                        {new Intl.NumberFormat("EN-US", {
+                                          style: "currency",
+                                          currency: "USD",
+                                        }).format(transaction.amount)}
+                                      </div>
+                                      <div className="font-mono text-xs text-white">
+                                        {transaction.tag}
+                                      </div>
+                                      <div className="font-mono text-xs text-white">
+                                        {transaction.description}
+                                      </div>
+                                    </div>
+                                  ))}
+                                </div>
+                              )}
+                          </div>
+                        );
+                      })}
+                      <div className={classes.row}>
+                        <div
+                          className={`font-mono text-xs whitespace-pre ${
+                            netMonth < 0 ? "text-red-500" : "text-green-500"
+                          }`}
+                        >
+                          {formatCurrency(netMonth)}
+                        </div>
+                        <div className="font-mono text-xs text-white">net</div>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
             </div>
-          ))}
+          );
+        })}
       </div>
     </div>
   );
