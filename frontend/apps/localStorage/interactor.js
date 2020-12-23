@@ -10,7 +10,7 @@ export default function createInteractor() {
     ...store,
     actions: {
       async set(key, state) {
-        log("[LOCAL_STORAGE] set state", state);
+        log("set", state);
         store.setState({
           ...store.getState(),
           [key]: state,

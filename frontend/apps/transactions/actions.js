@@ -1,6 +1,7 @@
 import uniqBy from "lodash/uniqBy";
 import uniq from "lodash/uniq";
 import createLogger from "utils/createLogger";
+import parseISO from "date-fns/parseISO";
 
 const log = createLogger("#B388FF", "[TRANSACTIONS]");
 
@@ -12,6 +13,8 @@ export function initiate({
   unsubscribe,
 }) {
   return async function initiate() {
+    const startStamp = performance.now();
+
     const [overrides, storedState] = await Promise.all([
       localStorage.selectors.get("transactions.overrides"),
       memoryStorage.selectors.get("transactions.state"),
@@ -54,6 +57,7 @@ export function initiate({
 
         return {
           ...transaction,
+          date: parseISO(transaction.date),
           description:
             transaction.description.length > 64
               ? transaction.description.slice(0, 64) + " ..."
@@ -71,6 +75,9 @@ export function initiate({
     ];
 
     // const storedOverrides = localStorage.getItem("overrides");
+
+    const endStamp = performance.now();
+    log("performance - initiate", endStamp - startStamp);
 
     store.setState({
       ...store.getState(),

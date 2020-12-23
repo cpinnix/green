@@ -1,6 +1,5 @@
 import React, { useEffect } from "react";
 import Head from "next/head";
-import Link from "next/link";
 import sum from "lodash/sum";
 import { format } from "date-fns";
 import { List, AutoSizer } from "react-virtualized";
@@ -8,6 +7,7 @@ import useInteractors from "hooks/useInteractors";
 import createLogger from "utils/createLogger";
 import createInteractors from "apps/transactions";
 import { MONTH_OPTIONS } from "apps/transactions/constants";
+import Navigation from "components/Navigation";
 import classes from "./index.module.css";
 
 const log = createLogger("#82B1FF", "[HOME]");
@@ -96,83 +96,83 @@ export default function Page() {
   return (
     <div className="h-screen">
       <Head>
-        <title>Green</title>
+        <title>Green - Transactions</title>
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <Link href="/trends">
-        <a className="text-white">Trends</a>
-      </Link>
-      <div className="container mx-auto px-8 flex flex-col h-full">
-        <div className="flex mt-16 mb-8">
-          <input
-            placeholder="search"
-            value={query}
-            onChange={(e) => {
-              changeQuery(e.target.value);
-            }}
-            className="flex-1 mr-4 font-mono text-xs p-3 border rounded border-white block bg-transparent text-white focus:outline-none focus:border-blue-500"
-          />
-          <div className="bg-black border rounded border-white font-mono text-xs text-white mr-4 flex items-center pl-3 focus-within:border-blue-500">
-            <div className="font-mono text-xs text-white">tag:</div>
-            <select
-              name="cars"
-              id="cars"
-              value={selectedTag}
-              className="pr-3 bg-transparent appearance-none focus:outline-none"
+      <div className="flex flex-col h-full">
+        <Navigation />
+        <div className="px-8 flex flex-col h-full">
+          <div className="flex my-8">
+            <input
+              placeholder="search"
+              value={query}
               onChange={(e) => {
-                changeTag(e.target.value);
+                changeQuery(e.target.value);
               }}
-            >
-              {tags.map((tag) => (
-                <option key={tag} value={tag}>
-                  {tag}
-                </option>
-              ))}
-            </select>
+              className="flex-1 mr-4 font-mono text-xs p-3 border rounded border-white block bg-transparent text-white focus:outline-none focus:border-blue-500"
+            />
+            <div className="bg-black border rounded border-white font-mono text-xs text-white mr-4 flex items-center pl-3 focus-within:border-blue-500">
+              <div className="font-mono text-xs text-white">tag:</div>
+              <select
+                name="cars"
+                id="cars"
+                value={selectedTag}
+                className="pr-3 bg-transparent appearance-none focus:outline-none"
+                onChange={(e) => {
+                  changeTag(e.target.value);
+                }}
+              >
+                {tags.map((tag) => (
+                  <option key={tag} value={tag}>
+                    {tag}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div className="bg-black border rounded border-white font-mono text-xs text-white flex items-center pl-3 focus-within:border-blue-500">
+              <div className="font-mono text-xs text-white">month:</div>
+              <select
+                name="month"
+                id="month"
+                value={selectedMonth}
+                className="pr-3 bg-transparent appearance-none focus:outline-none"
+                onChange={(e) => {
+                  changeMonth(e.target.value);
+                }}
+              >
+                {MONTH_OPTIONS.map((month) => (
+                  <option key={month} value={month}>
+                    {month}
+                  </option>
+                ))}
+              </select>
+            </div>
           </div>
-          <div className="bg-black border rounded border-white font-mono text-xs text-white mr-4 flex items-center pl-3 focus-within:border-blue-500">
-            <div className="font-mono text-xs text-white">month:</div>
-            <select
-              name="month"
-              id="month"
-              value={selectedMonth}
-              className="pr-3 bg-transparent appearance-none focus:outline-none"
-              onChange={(e) => {
-                changeMonth(e.target.value);
-              }}
-            >
-              {MONTH_OPTIONS.map((month) => (
-                <option key={month} value={month}>
-                  {month}
-                </option>
-              ))}
-            </select>
+          <div className="font-mono text-xs mb-8 text-white">
+            {count} transactions.{" "}
+            <span className={`${net < 0 ? "text-red-500" : "text-green-500"}`}>
+              {new Intl.NumberFormat("EN-US", {
+                style: "currency",
+                currency: "USD",
+              }).format(net)}
+            </span>{" "}
+            net.
           </div>
-        </div>
-        <div className="font-mono text-xs mb-8 text-white">
-          {count} transactions.{" "}
-          <span className={`${net < 0 ? "text-red-500" : "text-green-500"}`}>
-            {new Intl.NumberFormat("EN-US", {
-              style: "currency",
-              currency: "USD",
-            }).format(net)}
-          </span>{" "}
-          net.
-        </div>
-        <div className="flex-1 mb-16">
-          <AutoSizer>
-            {({ height, width }) => (
-              <List
-                width={width}
-                height={height}
-                rowCount={transactions.length}
-                rowHeight={32}
-                rowRenderer={rowRenderer}
-                className="border border-white rounded focus:outline-none focus-within:border-blue-500"
-                overscanRowCount={100}
-              />
-            )}
-          </AutoSizer>
+          <div className="flex-1 mb-16">
+            <AutoSizer>
+              {({ height, width }) => (
+                <List
+                  width={width}
+                  height={height}
+                  rowCount={transactions.length}
+                  rowHeight={32}
+                  rowRenderer={rowRenderer}
+                  className="border border-white rounded focus:outline-none focus-within:border-blue-500"
+                  overscanRowCount={100}
+                />
+              )}
+            </AutoSizer>
+          </div>
         </div>
       </div>
     </div>
