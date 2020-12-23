@@ -57,12 +57,12 @@ export function initiate({
 
         return {
           ...transaction,
+          tag: tag || "untagged",
           date: parseISO(transaction.date),
           description:
             transaction.description.length > 64
               ? transaction.description.slice(0, 64) + " ..."
               : transaction.description,
-          tag,
         };
       })
       .filter((transaction) => transaction.tag !== "transfer");
