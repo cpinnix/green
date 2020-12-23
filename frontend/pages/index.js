@@ -73,7 +73,10 @@ export default function Page() {
             transaction.amount < 0 ? "text-red-500" : "text-green-500"
           }`}
         >
-          {transaction.amount}
+          {new Intl.NumberFormat("EN-US", {
+            style: "currency",
+            currency: "USD",
+          }).format(transaction.amount)}
         </div>
         <div className="font-mono text-xs text-white">{transaction.tag}</div>
         <input
