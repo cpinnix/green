@@ -1,16 +1,16 @@
 export const MONTH_MAP = {
-  jan: "01",
-  feb: "02",
-  mar: "03",
-  apr: "04",
-  may: "05",
-  jun: "06",
-  jul: "07",
-  aug: "08",
-  sep: "09",
-  oct: "10",
-  nov: "11",
-  dec: "12",
+  jan: "0",
+  feb: "1",
+  mar: "2",
+  apr: "3",
+  may: "4",
+  jun: "5",
+  jul: "6",
+  aug: "7",
+  sep: "8",
+  oct: "9",
+  nov: "10",
+  dec: "11",
 };
 
 export const MONTH_OPTIONS = ["", ...Object.keys(MONTH_MAP)];

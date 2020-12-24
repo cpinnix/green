@@ -3,6 +3,7 @@ import Head from "next/head";
 import sum from "lodash/sum";
 import { format } from "date-fns";
 import { List, AutoSizer } from "react-virtualized";
+import Fade from "react-reveal/Fade";
 import useInteractors from "hooks/useInteractors";
 import createLogger from "utils/createLogger";
 import createInteractors from "apps/transactions";
@@ -22,6 +23,7 @@ function present(interactors) {
   const presentation = {
     state: {
       ...state,
+      loading: !interactors.transactions.state.initialized,
       filteredTransactions,
       count: filteredTransactions.length,
       net: sum(filteredTransactions.map((transaction) => transaction.amount)),
@@ -41,9 +43,9 @@ export default function Page() {
     interactors.transactions.actions.initiate();
   }, []);
 
-  const presentation = present(interactors);
   const {
     state: {
+      loading,
       query,
       count,
       net,
@@ -54,7 +56,7 @@ export default function Page() {
       overrides,
     },
     actions: { changeQuery, changeTag, changeMonth, changeDescription },
-  } = presentation;
+  } = present(interactors);
 
   const transactions = filteredTransactions;
 
@@ -104,79 +106,85 @@ export default function Page() {
       </Head>
       <div className="flex flex-col h-full">
         <Navigation />
-        <div className="px-8 flex flex-col h-full">
-          <div className="flex my-8">
-            <input
-              placeholder="search"
-              value={query}
-              onChange={(e) => {
-                changeQuery(e.target.value);
-              }}
-              className="flex-1 mr-4 font-mono text-xs p-3 border rounded border-white block bg-transparent text-white focus:outline-none focus:border-blue-500"
-            />
-            <div className="bg-black border rounded border-white font-mono text-xs text-white mr-4 flex items-center pl-3 focus-within:border-blue-500">
-              <div className="font-mono text-xs text-white">tag:</div>
-              <select
-                name="cars"
-                id="cars"
-                value={selectedTag}
-                className="pr-3 bg-transparent appearance-none focus:outline-none"
-                onChange={(e) => {
-                  changeTag(e.target.value);
-                }}
-              >
-                {tags.map((tag) => (
-                  <option key={tag} value={tag}>
-                    {tag}
-                  </option>
-                ))}
-              </select>
-            </div>
-            <div className="bg-black border rounded border-white font-mono text-xs text-white flex items-center pl-3 focus-within:border-blue-500">
-              <div className="font-mono text-xs text-white">month:</div>
-              <select
-                name="month"
-                id="month"
-                value={selectedMonth}
-                className="pr-3 bg-transparent appearance-none focus:outline-none"
-                onChange={(e) => {
-                  changeMonth(e.target.value);
-                }}
-              >
-                {MONTH_OPTIONS.map((month) => (
-                  <option key={month} value={month}>
-                    {month}
-                  </option>
-                ))}
-              </select>
-            </div>
-          </div>
-          <div className="font-mono text-xs mb-8 text-white">
-            {count} transactions.{" "}
-            <span className={`${net < 0 ? "text-red-500" : "text-green-500"}`}>
-              {new Intl.NumberFormat("EN-US", {
-                style: "currency",
-                currency: "USD",
-              }).format(net)}
-            </span>{" "}
-            net.
-          </div>
-          <div className="flex-1 mb-16">
-            <AutoSizer>
-              {({ height, width }) => (
-                <List
-                  width={width}
-                  height={height}
-                  rowCount={transactions.length}
-                  rowHeight={32}
-                  rowRenderer={rowRenderer}
-                  className="border border-white rounded focus:outline-none focus-within:border-blue-500"
-                  overscanRowCount={100}
+        {loading ? null : (
+          <Fade>
+            <div className="px-8 flex flex-col h-full">
+              <div className="flex my-8">
+                <input
+                  placeholder="search"
+                  value={query}
+                  onChange={(e) => {
+                    changeQuery(e.target.value);
+                  }}
+                  className="flex-1 mr-4 font-mono text-xs p-3 border rounded border-white block bg-transparent text-white focus:outline-none focus:border-blue-500"
                 />
-              )}
-            </AutoSizer>
-          </div>
-        </div>
+                <div className="bg-black border rounded border-white font-mono text-xs text-white mr-4 flex items-center pl-3 focus-within:border-blue-500">
+                  <div className="font-mono text-xs text-white">tag:</div>
+                  <select
+                    name="cars"
+                    id="cars"
+                    value={selectedTag}
+                    className="pr-3 bg-transparent appearance-none focus:outline-none"
+                    onChange={(e) => {
+                      changeTag(e.target.value);
+                    }}
+                  >
+                    {tags.map((tag) => (
+                      <option key={tag} value={tag}>
+                        {tag}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <div className="bg-black border rounded border-white font-mono text-xs text-white flex items-center pl-3 focus-within:border-blue-500">
+                  <div className="font-mono text-xs text-white">month:</div>
+                  <select
+                    name="month"
+                    id="month"
+                    value={selectedMonth}
+                    className="pr-3 bg-transparent appearance-none focus:outline-none"
+                    onChange={(e) => {
+                      changeMonth(e.target.value);
+                    }}
+                  >
+                    {MONTH_OPTIONS.map((month) => (
+                      <option key={month} value={month}>
+                        {month}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+              <div className="font-mono text-xs mb-8 text-white">
+                {count} transactions.{" "}
+                <span
+                  className={`${net < 0 ? "text-red-500" : "text-green-500"}`}
+                >
+                  {new Intl.NumberFormat("EN-US", {
+                    style: "currency",
+                    currency: "USD",
+                  }).format(net)}
+                </span>{" "}
+                net.
+              </div>
+              <div className="flex-1 mb-16">
+                <AutoSizer>
+                  {({ height, width }) => (
+                    <List
+                      width={width}
+                      height={height}
+                      rowCount={transactions.length}
+                      rowHeight={32}
+                      rowRenderer={rowRenderer}
+                      className="border border-white rounded focus:outline-none focus-within:border-blue-500"
+                      overscanRowCount={100}
+                    />
+                  )}
+                </AutoSizer>
+              </div>
+            </div>
+          </Fade>
+        )}
       </div>
     </div>
   );

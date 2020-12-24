@@ -1,4 +1,5 @@
 import { MONTH_MAP } from "./constants";
+import getMonth from "date-fns/getMonth";
 
 export function filteredTransactions(state) {
   const { query, transactions, selectedTag, selectedMonth, overrides } = state;
@@ -20,8 +21,7 @@ export function filteredTransactions(state) {
     })
     .filter((transaction) => {
       if (selectedMonth.length === 0) return true;
-
-      return transaction.date.slice(5, 7) === MONTH_MAP[selectedMonth];
+      return getMonth(transaction.date) == MONTH_MAP[selectedMonth];
     });
 
   return filteredTransactions;

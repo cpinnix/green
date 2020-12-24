@@ -1,4 +1,8 @@
+import createSpan from "utils/createSpan";
+
 export async function fetchTransactions() {
+  const endSpan = createSpan("[TRANSACTIONS] fetchTransactions");
+
   const response = await fetch("//localhost:4000", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -15,10 +19,14 @@ export async function fetchTransactions() {
     }),
   }).then((response) => response.json());
 
+  endSpan();
+
   return response?.data?.transactions;
 }
 
 export async function fetchTaggedExpressions() {
+  const endSpan = createSpan("[TRANSACTIONS] fetchTaggedExpressions");
+
   const response = await fetch("//localhost:4000", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -32,6 +40,8 @@ export async function fetchTaggedExpressions() {
           }`,
     }),
   }).then((response) => response.json());
+
+  endSpan();
 
   return response?.data?.taggedExpressions;
 }

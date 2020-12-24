@@ -15,7 +15,7 @@ export default function createInteractor() {
     },
     selectors: {
       async get(key) {
-        return store.getState()[key];
+        return store.getState()[key] || {};
       },
     },
   };
