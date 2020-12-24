@@ -1,9 +1,8 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, Profiler } from "react";
 import Head from "next/head";
 import Fade from "react-reveal/Fade";
 import useInteractors from "hooks/useInteractors";
 import createInteractors from "apps/transactions";
-import createLogger from "utils/createLogger";
 import getYear from "date-fns/getYear";
 import getMonth from "date-fns/getMonth";
 import uniq from "lodash/uniq";
@@ -11,14 +10,16 @@ import sumBy from "lodash/sumBy";
 import { MONTH_OPTIONS } from "apps/transactions/constants";
 import Navigation from "components/Navigation";
 import accounting from "utils/accounting";
-import createSpan from "utils/createSpan";
+import createLogger from "utils/createLogger";
+import createTracer from "utils/createTracer";
 import { format } from "date-fns";
 import classes from "./index.module.css";
 
-const log = createLogger("#82B1FF", "[TRENDS]");
+const log = createLogger("#82B1FF", "[SUMMARY]");
+const { createSpan } = createTracer(log);
 
 function present(interactors) {
-  const endSpan = createSpan("[TRENDS] present");
+  const endSpan = createSpan("present");
 
   log("interactors", interactors);
 
@@ -110,6 +111,16 @@ function formatCurrency(amount) {
   })[0];
 }
 
+function Accordion({ header, children }) {
+  const [open, setOpen] = useState(false);
+  return (
+    <div>
+      <div onClick={() => setOpen(!open)}>{header}</div>
+      {open && children}
+    </div>
+  );
+}
+
 export default function Page() {
   const interactors = useInteractors(() => createInteractors());
 
@@ -117,59 +128,80 @@ export default function Page() {
     interactors.transactions.actions.initiate();
   }, []);
 
-  const [open, setOpen] = useState(null);
-
   const {
     state: { loading, years, months, tags },
     selectors: { net, transactions },
   } = present(interactors);
 
   return (
-    <div>
-      <Head>
-        <title>Green - Trends</title>
-        <link rel="icon" href="/favicon.ico" />
-      </Head>
-      <Navigation />
-      {loading ? null : (
-        <div className="p-8">
-          {years.map((year) => {
-            const netYear = net(year);
-
-            return (
-              <div key={year}>
-                <Fade>
-                  <div className="text-white font-mono text-xs mb-4">
-                    {year}
-                  </div>
-                  <div className="mb-8 border rounded border-white">
-                    {tags.map((tag) => {
-                      const netTag = net(year, null, tag);
-                      return (
-                        <div key={tag}>
-                          <div
-                            className={`${classes.row} cursor-pointer`}
-                            onClick={() =>
-                              open && open[0] === year && open[2] === tag
-                                ? setOpen(null)
-                                : setOpen([year, null, tag])
-                            }
-                          >
-                            <div
-                              className={`font-mono text-xs whitespace-pre ${
-                                netTag < 0 ? "text-red-500" : "text-green-500"
-                              }`}
+    <Profiler
+      onRender={(
+        id, // the "id" prop of the Profiler tree that has just committed
+        phase, // either "mount" (if the tree just mounted) or "update" (if it re-rendered)
+        actualDuration, // time spent rendering the committed update
+        baseDuration, // estimated time to render the entire subtree without memoization
+        startTime, // when React began rendering this update
+        commitTime, // when React committed this update
+        interactions // the Set of interactions belonging to this update
+      ) => {
+        log("[PERFORMANCE] actual render duration", actualDuration);
+      }}
+    >
+      <div>
+        <Head>
+          <title>Green - Trends</title>
+          <link rel="icon" href="/favicon.ico" />
+        </Head>
+        <Navigation />
+        {loading ? null : (
+          <div className="p-8">
+            {years.map((year) => {
+              const netYear = net(year);
+              return (
+                <div key={year}>
+                  <Fade>
+                    <div className="text-white font-mono text-xs mb-4">
+                      {year}
+                    </div>
+                    <div className="mb-8 border rounded border-white">
+                      {tags.map((tag) => {
+                        const netTag = net(year, null, tag);
+                        const rows = transactions(year, null, tag);
+                        return (
+                          <div key={tag}>
+                            <Accordion
+                              enabled={rows.length > 0}
+                              header={
+                                <div
+                                  className={`
+                                  ${classes.row}
+                                  ${
+                                    rows.length > 0
+                                      ? "cursor-pointer hover:bg-gray-900"
+                                      : ""
+                                  }
+                                `}
+                                >
+                                  <div
+                                    className={`font-mono text-xs whitespace-pre ${
+                                      netTag < 0
+                                        ? "text-red-500"
+                                        : "text-green-500"
+                                    }`}
+                                  >
+                                    {formatCurrency(netTag)}
+                                  </div>
+                                  <div className="font-mono text-xs text-white">
+                                    {tag}
+                                  </div>
+                                  <div className="font-mono text-xs text-white">
+                                    {rows.length}
+                                  </div>
+                                </div>
+                              }
                             >
-                              {formatCurrency(netTag)}
-                            </div>
-                            <div className="font-mono text-xs text-white">
-                              {tag}
-                            </div>
-                          </div>
-                          {open && open[0] === year && open[2] === tag && (
-                            <div className="border-t border-b border-white my-2 py-2">
-                              {transactions(year, null, tag).map(
-                                (transaction, index) => (
+                              <div className="border-t border-b border-white my-2 py-2 max-h-64 overflow-scroll">
+                                {rows.map((transaction, index) => (
                                   <div
                                     key={transaction.hash}
                                     className={classes.transaction}
@@ -205,75 +237,72 @@ export default function Page() {
                                       {transaction.description}
                                     </div>
                                   </div>
-                                )
-                              )}
-                            </div>
-                          )}
+                                ))}
+                              </div>
+                            </Accordion>
+                          </div>
+                        );
+                      })}
+                      <div className={classes.row}>
+                        <div
+                          className={`font-mono text-xs whitespace-pre ${
+                            netYear < 0 ? "text-red-500" : "text-green-500"
+                          }`}
+                        >
+                          {formatCurrency(netYear)}
                         </div>
-                      );
-                    })}
-                    <div className={classes.row}>
-                      <div
-                        className={`font-mono text-xs whitespace-pre ${
-                          netYear < 0 ? "text-red-500" : "text-green-500"
-                        }`}
-                      >
-                        {formatCurrency(netYear)}
+                        <div className="font-mono text-xs text-white">net</div>
                       </div>
-                      <div className="font-mono text-xs text-white">net</div>
                     </div>
-                  </div>
-                </Fade>
-                {months.map((month) => {
-                  const netMonth = net(year, month);
+                  </Fade>
+                  {months.map((month) => {
+                    const netMonth = net(year, month);
 
-                  return (
-                    <div key={month}>
-                      <Fade>
-                        <div className="text-white font-mono text-xs mb-4">
-                          {MONTH_OPTIONS[month + 1]} {year}
-                        </div>
-                        <div className="mb-8 border rounded border-white">
-                          {tags.map((tag) => {
-                            const netTag = net(year, month, tag);
-                            const rows = transactions(year, month, tag);
+                    return (
+                      <div key={month}>
+                        <Fade>
+                          <div className="text-white font-mono text-xs mb-4">
+                            {MONTH_OPTIONS[month + 1]} {year}
+                          </div>
+                          <div className="mb-8 border rounded border-white">
+                            {tags.map((tag) => {
+                              const netTag = net(year, month, tag);
+                              const rows = transactions(year, month, tag);
 
-                            return (
-                              <div key={tag}>
-                                <div
-                                  className={`${classes.row} ${
-                                    rows.length > 0
-                                      ? "cursor-pointer hover:bg-gray-900"
-                                      : ""
-                                  }`}
-                                  onClick={() =>
-                                    open &&
-                                    open[0] === year &&
-                                    open[1] === month &&
-                                    open[2] === tag
-                                      ? setOpen(null)
-                                      : setOpen([year, month, tag])
-                                  }
-                                >
-                                  <div
-                                    className={`font-mono text-xs whitespace-pre ${
-                                      netTag < 0
-                                        ? "text-red-500"
-                                        : "text-green-500"
-                                    }`}
+                              return (
+                                <div key={tag}>
+                                  <Accordion
+                                    enabled={rows.length > 0}
+                                    header={
+                                      <div
+                                        className={`
+                                        ${classes.row}
+                                        ${
+                                          rows.length > 0
+                                            ? "cursor-pointer hover:bg-gray-900"
+                                            : ""
+                                        }
+                                      `}
+                                      >
+                                        <div
+                                          className={`font-mono text-xs whitespace-pre ${
+                                            netTag < 0
+                                              ? "text-red-500"
+                                              : "text-green-500"
+                                          }`}
+                                        >
+                                          {formatCurrency(netTag)}
+                                        </div>{" "}
+                                        <div className="font-mono text-xs text-white">
+                                          {tag}
+                                        </div>
+                                        <div className="font-mono text-xs text-white">
+                                          {rows.length}
+                                        </div>
+                                      </div>
+                                    }
                                   >
-                                    {formatCurrency(netTag)}
-                                  </div>{" "}
-                                  <div className="font-mono text-xs text-white">
-                                    {tag}
-                                  </div>
-                                </div>
-                                {open &&
-                                  open[0] === year &&
-                                  open[1] === month &&
-                                  open[2] === tag &&
-                                  rows.length > 0 && (
-                                    <div className="border-t border-b border-white my-2 py-2">
+                                    <div className="border-t border-b border-white my-2 py-2 max-h-64 overflow-scroll">
                                       {rows.map((transaction, index) => (
                                         <div
                                           key={transaction.hash}
@@ -312,32 +341,35 @@ export default function Page() {
                                         </div>
                                       ))}
                                     </div>
-                                  )}
+                                  </Accordion>
+                                </div>
+                              );
+                            })}
+                            <div className={classes.row}>
+                              <div
+                                className={`font-mono text-xs whitespace-pre ${
+                                  netMonth < 0
+                                    ? "text-red-500"
+                                    : "text-green-500"
+                                }`}
+                              >
+                                {formatCurrency(netMonth)}
                               </div>
-                            );
-                          })}
-                          <div className={classes.row}>
-                            <div
-                              className={`font-mono text-xs whitespace-pre ${
-                                netMonth < 0 ? "text-red-500" : "text-green-500"
-                              }`}
-                            >
-                              {formatCurrency(netMonth)}
-                            </div>
-                            <div className="font-mono text-xs text-white">
-                              net
+                              <div className="font-mono text-xs text-white">
+                                net
+                              </div>
                             </div>
                           </div>
-                        </div>
-                      </Fade>
-                    </div>
-                  );
-                })}
-              </div>
-            );
-          })}
-        </div>
-      )}
-    </div>
+                        </Fade>
+                      </div>
+                    );
+                  })}
+                </div>
+              );
+            })}
+          </div>
+        )}
+      </div>
+    </Profiler>
   );
 }

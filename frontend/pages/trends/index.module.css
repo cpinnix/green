@@ -3,7 +3,7 @@
   align-items: center;
   display: grid;
   gap: 2rem;
-  grid-template-columns: min-content auto;
+  grid-template-columns: min-content auto max-content;
   @apply px-4;
 }
 

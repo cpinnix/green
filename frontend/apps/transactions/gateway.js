@@ -1,7 +1,11 @@
-import createSpan from "utils/createSpan";
+import createLogger from "utils/createLogger";
+import createTracer from "utils/createTracer";
+
+const log = createLogger("#B388FF", "[TRANSACTIONS]");
+const { createSpan } = createTracer(log);
 
 export async function fetchTransactions() {
-  const endSpan = createSpan("[TRANSACTIONS] fetchTransactions");
+  const endSpan = createSpan("`fetchTransactions`");
 
   const response = await fetch("//localhost:4000", {
     method: "POST",
@@ -25,7 +29,7 @@ export async function fetchTransactions() {
 }
 
 export async function fetchTaggedExpressions() {
-  const endSpan = createSpan("[TRANSACTIONS] fetchTaggedExpressions");
+  const endSpan = createSpan("`fetchTaggedExpressions`");
 
   const response = await fetch("//localhost:4000", {
     method: "POST",

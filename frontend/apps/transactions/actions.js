@@ -2,10 +2,11 @@ import uniqBy from "lodash/uniqBy";
 import uniq from "lodash/uniq";
 import pick from "lodash/pick";
 import createLogger from "utils/createLogger";
-import createSpan from "utils/createSpan";
+import createTracer from "utils/createTracer";
 import parseISO from "date-fns/parseISO";
 
 const log = createLogger("#B388FF", "[TRANSACTIONS]");
+const { createSpan } = createTracer(log);
 
 export function initiate({
   store,
@@ -15,9 +16,7 @@ export function initiate({
   unsubscribe,
 }) {
   return async function initiate() {
-    const endAwaitSpan = createSpan(
-      "[TRANSACTIONS] storage wait in `initiate`"
-    );
+    const endAwaitSpan = createSpan("storage wait in `initiate`");
     const [overrides, storedState] = await Promise.all([
       localStorage.selectors.get("transactions.overrides"),
       memoryStorage.selectors.get("transactions.state"),
@@ -39,9 +38,7 @@ export function initiate({
     });
 
     if (!storedState.initialized) {
-      const endFetchSpan = createSpan(
-        "[TRANSACTIONS] total fetch time in `initiate`"
-      );
+      const endFetchSpan = createSpan("total fetch time in `initiate`");
       const [transactions, taggedExpressions] = await Promise.all([
         gateway.fetchTransactions(),
         gateway.fetchTaggedExpressions(),
@@ -52,7 +49,7 @@ export function initiate({
       log("received tagged expressions", taggedExpressions);
 
       const endDecorationSpan = createSpan(
-        "[TRANSACTIONS] transaction decoration in `initiate`"
+        "transaction decoration in `initiate`"
       );
 
       let expressions = taggedExpressions

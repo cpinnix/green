@@ -2,8 +2,10 @@ import createStore from "bones/createStore";
 import * as actions from "./actions";
 import * as selectors from "./selectors";
 import createLogger from "utils/createLogger";
+import createTracer from "utils/createTracer";
 
 const log = createLogger("#B388FF", "[TRANSACTIONS]");
+const { createSpan } = createTracer(log);
 
 const DEFAULT_STATE = {
   query: "",
