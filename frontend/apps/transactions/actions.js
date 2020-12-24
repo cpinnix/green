@@ -4,6 +4,7 @@ import pick from "lodash/pick";
 import createLogger from "utils/createLogger";
 import createTracer from "utils/createTracer";
 import parseISO from "date-fns/parseISO";
+import faker from "faker";
 
 const log = createLogger("#B388FF", "[TRANSACTIONS]");
 const { createSpan } = createTracer(log);
@@ -17,8 +18,9 @@ export function initiate({
 }) {
   return async function initiate() {
     const endAwaitSpan = createSpan("storage wait in `initiate`");
-    const [overrides, storedState] = await Promise.all([
+    const [overrides, demoMode, storedState] = await Promise.all([
       localStorage.selectors.get("transactions.overrides"),
+      localStorage.selectors.get("transactions.demo"),
       memoryStorage.selectors.get("transactions.state"),
     ]);
     endAwaitSpan();
@@ -107,6 +109,18 @@ export function initiate({
           decoratedTransactions.map((transaction) => transaction.tag)
         ).filter((tag) => tag),
       ];
+
+      if (demoMode.enabled) {
+        decoratedTransactions = decoratedTransactions.map((transaction) => ({
+          ...transaction,
+          amount: Math.random() * transaction.amount,
+          description: faker.lorem.words(
+            transaction.description.split(" ").filter((str) => str.length > 3)
+              .length
+          ),
+          hash: faker.helpers.shuffle(transaction.hash.split("")).join(""),
+        }));
+      }
 
       endDecorationSpan();
 

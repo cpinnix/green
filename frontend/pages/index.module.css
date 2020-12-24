@@ -9,6 +9,6 @@
   align-items: center;
   display: grid;
   gap: 2rem;
-  grid-template-columns: 2rem 16rem 6rem 4rem 8rem auto;
-  padding-left: 1rem;
+  grid-template-columns: min-content 8rem auto max-content min-content;
+  @apply px-4;
 }

@@ -6,6 +6,7 @@ import { List, AutoSizer } from "react-virtualized";
 import Fade from "react-reveal/Fade";
 import useInteractors from "hooks/useInteractors";
 import createLogger from "utils/createLogger";
+import formatCurrency from "utils/formatCurrency";
 import createInteractors from "apps/transactions";
 import { MONTH_OPTIONS } from "apps/transactions/constants";
 import Navigation from "components/Navigation";
@@ -65,21 +66,14 @@ export default function Page() {
 
     const content = (
       <div className={classes.row}>
-        <div className="font-mono text-xs text-white">{index}</div>
-        <div className="font-mono text-xs text-white">{transaction.hash}</div>
-        <div className="font-mono text-xs text-white">
-          {format(new Date(transaction.date), "MMM dd yyyy")}
-        </div>
         <div
-          className={`font-mono text-xs text-white ${
+          className={`font-mono text-xs text-white whitespace-pre ${
             transaction.amount < 0 ? "text-red-500" : "text-green-500"
           }`}
         >
-          {new Intl.NumberFormat("EN-US", {
-            style: "currency",
-            currency: "USD",
-          }).format(transaction.amount)}
+          {formatCurrency(transaction.amount)}
         </div>
+
         <div className="font-mono text-xs text-white">{transaction.tag}</div>
         <input
           value={overrides[transaction.hash] || transaction.description}
@@ -88,6 +82,10 @@ export default function Page() {
             changeDescription(transaction.hash, e.target.value);
           }}
         />
+        <div className="font-mono text-xs text-white">
+          {format(new Date(transaction.date), "MMM dd yyyy")}
+        </div>
+        <div className="font-mono text-xs text-white">{transaction.hash}</div>
       </div>
     );
 

@@ -12,6 +12,7 @@ import Navigation from "components/Navigation";
 import accounting from "utils/accounting";
 import createLogger from "utils/createLogger";
 import createTracer from "utils/createTracer";
+import formatCurrency from "utils/formatCurrency";
 import { format } from "date-fns";
 import classes from "./index.module.css";
 
@@ -101,16 +102,6 @@ function present(interactors) {
   return presentation;
 }
 
-function formatCurrency(amount) {
-  return accounting.formatColumn([amount, 1000000.0], {
-    format: {
-      pos: "%s %v", // for positive values, eg. "$ 1.00" (required)
-      neg: "%s -%v", // for negative values, eg. "$ (1.00)" [optional]
-      zero: "%s  -- ", // for zero values, eg. "$  --" [optional]
-    },
-  })[0];
-}
-
 function Accordion({ header, children }) {
   const [open, setOpen] = useState(false);
   return (
@@ -194,16 +185,25 @@ export default function Page() {
                               }
                             >
                               <div className="border-t border-b border-white my-2 py-2 max-h-64 overflow-scroll">
-                                {rows.map((transaction, index) => (
+                                {rows.map((transaction) => (
                                   <div
                                     key={transaction.hash}
                                     className={classes.transaction}
                                   >
-                                    <div className="font-mono text-xs text-white">
-                                      {index}
+                                    <div
+                                      className={`font-mono text-xs text-white whitespace-pre ${
+                                        transaction.amount < 0
+                                          ? "text-red-500"
+                                          : "text-green-500"
+                                      }`}
+                                    >
+                                      {formatCurrency(transaction.amount)}
                                     </div>
                                     <div className="font-mono text-xs text-white">
-                                      {transaction.hash}
+                                      {transaction.tag}
+                                    </div>
+                                    <div className="font-mono text-xs text-white overflow-x-hidden whitespace-nowrap">
+                                      {transaction.description}
                                     </div>
                                     <div className="font-mono text-xs text-white">
                                       {format(
@@ -211,23 +211,8 @@ export default function Page() {
                                         "MMM dd yyyy"
                                       )}
                                     </div>
-                                    <div
-                                      className={`font-mono text-xs text-white ${
-                                        transaction.amount < 0
-                                          ? "text-red-500"
-                                          : "text-green-500"
-                                      }`}
-                                    >
-                                      {new Intl.NumberFormat("EN-US", {
-                                        style: "currency",
-                                        currency: "USD",
-                                      }).format(transaction.amount)}
-                                    </div>
                                     <div className="font-mono text-xs text-white">
-                                      {transaction.tag}
-                                    </div>
-                                    <div className="font-mono text-xs text-white">
-                                      {transaction.description}
+                                      {transaction.hash}
                                     </div>
                                   </div>
                                 ))}
@@ -296,16 +281,25 @@ export default function Page() {
                                     }
                                   >
                                     <div className="border-t border-b border-white my-2 py-2 max-h-64 overflow-scroll">
-                                      {rows.map((transaction, index) => (
+                                      {rows.map((transaction) => (
                                         <div
                                           key={transaction.hash}
                                           className={classes.transaction}
                                         >
-                                          <div className="font-mono text-xs text-white">
-                                            {index}
+                                          <div
+                                            className={`font-mono text-xs text-white whitespace-pre ${
+                                              transaction.amount < 0
+                                                ? "text-red-500"
+                                                : "text-green-500"
+                                            }`}
+                                          >
+                                            {formatCurrency(transaction.amount)}
                                           </div>
                                           <div className="font-mono text-xs text-white">
-                                            {transaction.hash}
+                                            {transaction.tag}
+                                          </div>
+                                          <div className="font-mono text-xs text-white overflow-x-hidden whitespace-nowrap">
+                                            {transaction.description}
                                           </div>
                                           <div className="font-mono text-xs text-white">
                                             {format(
@@ -313,23 +307,8 @@ export default function Page() {
                                               "MMM dd yyyy"
                                             )}
                                           </div>
-                                          <div
-                                            className={`font-mono text-xs text-white ${
-                                              transaction.amount < 0
-                                                ? "text-red-500"
-                                                : "text-green-500"
-                                            }`}
-                                          >
-                                            {new Intl.NumberFormat("EN-US", {
-                                              style: "currency",
-                                              currency: "USD",
-                                            }).format(transaction.amount)}
-                                          </div>
                                           <div className="font-mono text-xs text-white">
-                                            {transaction.tag}
-                                          </div>
-                                          <div className="font-mono text-xs text-white">
-                                            {transaction.description}
+                                            {transaction.hash}
                                           </div>
                                         </div>
                                       ))}
