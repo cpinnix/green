@@ -49,3 +49,25 @@ export async function fetchTaggedExpressions() {
 
   return response?.data?.taggedExpressions;
 }
+
+export async function fetchBudgets() {
+  const endSpan = createSpan("`fetchBudgets`");
+
+  const response = await fetch("//localhost:4000", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      query: `
+          query {
+            budgets {
+              amount
+              tag
+            }
+          }`,
+    }),
+  }).then((response) => response.json());
+
+  endSpan();
+
+  return response?.data?.budgets;
+}

@@ -3,8 +3,7 @@
   align-items: center;
   display: grid;
   gap: 2rem;
-  grid-template-columns: min-content auto max-content;
-  @apply px-4;
+  grid-template-columns: 8rem 8rem 8rem auto max-content;
 }
 
 .transaction {
@@ -13,5 +12,4 @@
   display: grid;
   gap: 2rem;
   grid-template-columns: min-content 8rem auto max-content min-content;
-  @apply px-4;
 }

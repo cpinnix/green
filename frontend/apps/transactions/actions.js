@@ -29,7 +29,7 @@ export function initiate({
       localStorage.actions.set("transactions.overrides", state.overrides);
       memoryStorage.actions.set(
         "transactions.state",
-        pick(state, ["transactions", "initialized", "tags"])
+        pick(state, ["transactions", "initialized", "tags", "budget"])
       );
     });
 
@@ -41,17 +41,27 @@ export function initiate({
 
     if (!storedState.initialized) {
       const endFetchSpan = createSpan("total fetch time in `initiate`");
-      const [transactions, taggedExpressions] = await Promise.all([
+      const [transactions, taggedExpressions, budgets] = await Promise.all([
         gateway.fetchTransactions(),
         gateway.fetchTaggedExpressions(),
+        gateway.fetchBudgets(),
       ]);
       endFetchSpan();
 
       log("received transactions", transactions);
       log("received tagged expressions", taggedExpressions);
+      log("received budgets", budgets);
 
       const endDecorationSpan = createSpan(
         "transaction decoration in `initiate`"
+      );
+
+      const budget = budgets.reduce(
+        (acc, budget) => ({
+          ...acc,
+          [budget.tag]: budget.amount,
+        }),
+        {}
       );
 
       let expressions = taggedExpressions
@@ -128,6 +138,7 @@ export function initiate({
         ...store.getState(),
         initialized: true,
         transactions: decoratedTransactions,
+        budget,
         tags,
       });
     }

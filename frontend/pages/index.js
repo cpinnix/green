@@ -66,6 +66,7 @@ export default function Page() {
 
     const content = (
       <div className={classes.row}>
+        <div className="font-mono text-xs text-white">{transaction.tag}</div>
         <div
           className={`font-mono text-xs text-white whitespace-pre ${
             transaction.amount < 0 ? "text-red-500" : "text-green-500"
@@ -73,8 +74,6 @@ export default function Page() {
         >
           {formatCurrency(transaction.amount)}
         </div>
-
-        <div className="font-mono text-xs text-white">{transaction.tag}</div>
         <input
           value={overrides[transaction.hash] || transaction.description}
           className="font-mono text-xs text-white bg-transparent focus:outline-none"
@@ -114,9 +113,9 @@ export default function Page() {
                   onChange={(e) => {
                     changeQuery(e.target.value);
                   }}
-                  className="flex-1 mr-4 font-mono text-xs p-3 border rounded border-white block bg-transparent text-white focus:outline-none focus:border-blue-500"
+                  className="flex-1 mr-4 font-mono text-xs py-2 border-b border-white block bg-transparent text-white focus:outline-none focus:border-blue-500"
                 />
-                <div className="bg-black border rounded border-white font-mono text-xs text-white mr-4 flex items-center pl-3 focus-within:border-blue-500">
+                <div className="bg-black border-b border-white font-mono text-xs text-white mr-4 flex items-center focus-within:border-blue-500">
                   <div className="font-mono text-xs text-white">tag:</div>
                   <select
                     name="cars"
@@ -134,7 +133,7 @@ export default function Page() {
                     ))}
                   </select>
                 </div>
-                <div className="bg-black border rounded border-white font-mono text-xs text-white flex items-center pl-3 focus-within:border-blue-500">
+                <div className="bg-black border-b border-white font-mono text-xs text-white flex items-center focus-within:border-blue-500">
                   <div className="font-mono text-xs text-white">month:</div>
                   <select
                     name="month"
@@ -153,7 +152,7 @@ export default function Page() {
                   </select>
                 </div>
               </div>
-              <div className="font-mono text-xs mb-8 text-white">
+              <div className="font-mono text-xs mb-2 text-white">
                 {count} transactions.{" "}
                 <span
                   className={`${net < 0 ? "text-red-500" : "text-green-500"}`}
@@ -165,7 +164,7 @@ export default function Page() {
                 </span>{" "}
                 net.
               </div>
-              <div className="flex-1 mb-16">
+              <div className="flex-1 mb-8">
                 <AutoSizer>
                   {({ height, width }) => (
                     <List
@@ -174,7 +173,7 @@ export default function Page() {
                       rowCount={transactions.length}
                       rowHeight={32}
                       rowRenderer={rowRenderer}
-                      className="border border-white rounded focus:outline-none focus-within:border-blue-500"
+                      className="border-t border-b border-gray-600 focus:outline-none focus-within:border-blue-500"
                       overscanRowCount={100}
                     />
                   )}

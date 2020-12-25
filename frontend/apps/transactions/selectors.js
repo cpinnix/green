@@ -26,3 +26,7 @@ export function filteredTransactions(state) {
 
   return filteredTransactions;
 }
+
+export function budget(state) {
+  return state.budget;
+}

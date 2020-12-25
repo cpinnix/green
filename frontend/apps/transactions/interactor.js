@@ -11,6 +11,7 @@ const DEFAULT_STATE = {
   query: "",
   transactions: [],
   filteredTransactions: [],
+  budget: {},
   tags: [],
   selectedTag: "",
   selectedMonth: "",
@@ -47,6 +48,7 @@ export default function createInteractor({
     },
     selectors: {
       filteredTransactions: selectors.filteredTransactions,
+      budget: selectors.budget,
     },
   };
 }

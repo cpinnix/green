@@ -9,7 +9,13 @@ import uniq from "lodash/uniq";
 import sumBy from "lodash/sumBy";
 import { MONTH_OPTIONS } from "apps/transactions/constants";
 import Navigation from "components/Navigation";
-import accounting from "utils/accounting";
+import {
+  Sparklines,
+  SparklinesBars,
+  SparklinesCurve,
+  SparklinesLine,
+  SparklinesReferenceLine,
+} from "react-sparklines";
 import createLogger from "utils/createLogger";
 import createTracer from "utils/createTracer";
 import formatCurrency from "utils/formatCurrency";
@@ -44,6 +50,9 @@ function present(interactors) {
       years,
       months,
       tags,
+      budget: interactors.transactions.selectors.budget(
+        interactors.transactions.state
+      ),
     },
     selectors: {
       net(year, month, tag) {
@@ -102,11 +111,11 @@ function present(interactors) {
   return presentation;
 }
 
-function Accordion({ header, children }) {
+function Accordion({ header, children, enabled }) {
   const [open, setOpen] = useState(false);
   return (
     <div>
-      <div onClick={() => setOpen(!open)}>{header}</div>
+      <div onClick={() => enabled && setOpen(!open)}>{header}</div>
       {open && children}
     </div>
   );
@@ -120,7 +129,7 @@ export default function Page() {
   }, []);
 
   const {
-    state: { loading, years, months, tags },
+    state: { loading, years, months, tags, budget },
     selectors: { net, transactions },
   } = present(interactors);
 
@@ -138,7 +147,7 @@ export default function Page() {
         </Head>
         <Navigation />
         {loading ? null : (
-          <div className="p-8">
+          <div className="px-8 mt-8">
             {years.map((year) => {
               const netYear = net(year);
               return (
@@ -147,7 +156,23 @@ export default function Page() {
                     <div className="text-white font-mono text-xs mb-4">
                       {year}
                     </div>
-                    <div className="mb-8 border rounded border-white">
+                    <div className={classes.row}>
+                      <div className="font-mono text-xs text-gray-500">tag</div>
+                      <div className={`font-mono text-xs text-gray-500`}>
+                        amount
+                      </div>
+                      <div className={`font-mono text-xs text-gray-500`}>
+                        budget
+                      </div>
+                      <div className={`font-mono text-xs text-gray-500`}>
+                        diff
+                      </div>
+
+                      <div className="font-mono text-xs text-gray-500">
+                        transactions
+                      </div>
+                    </div>
+                    <div className="mb-8 border-t border-b border-gray-600">
                       {tags.map((tag) => {
                         const netTag = net(year, null, tag);
                         const rows = transactions(year, null, tag);
@@ -166,6 +191,9 @@ export default function Page() {
                                   }
                                 `}
                                 >
+                                  <div className="font-mono text-xs text-white">
+                                    {tag}
+                                  </div>
                                   <div
                                     className={`font-mono text-xs whitespace-pre ${
                                       netTag < 0
@@ -175,16 +203,27 @@ export default function Page() {
                                   >
                                     {formatCurrency(netTag)}
                                   </div>
-                                  <div className="font-mono text-xs text-white">
-                                    {tag}
+                                  <div
+                                    className={`font-mono text-xs whitespace-pre text-gray-500`}
+                                  >
+                                    {formatCurrency(budget[tag] * 12)}
                                   </div>
-                                  <div className="font-mono text-xs text-white">
+                                  <div
+                                    className={`font-mono text-xs whitespace-pre ${
+                                      netTag - budget[tag] * 12 < 0
+                                        ? "text-red-500"
+                                        : "text-green-500"
+                                    }`}
+                                  >
+                                    {formatCurrency(netTag - budget[tag] * 12)}
+                                  </div>
+                                  <div className="font-mono text-xs text-gray-500">
                                     {rows.length}
                                   </div>
                                 </div>
                               }
                             >
-                              <div className="border-t border-b border-white my-2 py-2 max-h-64 overflow-scroll">
+                              <div className="border-t border-b border-white max-h-64 overflow-scroll">
                                 {rows.map((transaction) => (
                                   <div
                                     key={transaction.hash}
@@ -222,6 +261,7 @@ export default function Page() {
                         );
                       })}
                       <div className={classes.row}>
+                        <div className="font-mono text-xs text-white">net</div>
                         <div
                           className={`font-mono text-xs whitespace-pre ${
                             netYear < 0 ? "text-red-500" : "text-green-500"
@@ -229,7 +269,20 @@ export default function Page() {
                         >
                           {formatCurrency(netYear)}
                         </div>
-                        <div className="font-mono text-xs text-white">net</div>
+                        <div
+                          className={`font-mono text-xs whitespace-pre text-gray-500`}
+                        >
+                          {formatCurrency(budget.net * 12)}
+                        </div>
+                        <div
+                          className={`font-mono text-xs whitespace-pre ${
+                            netYear - budget.net * 12 < 0
+                              ? "text-red-500"
+                              : "text-green-500"
+                          }`}
+                        >
+                          {formatCurrency(netYear - budget.net * 12)}
+                        </div>
                       </div>
                     </div>
                   </Fade>
@@ -242,7 +295,24 @@ export default function Page() {
                           <div className="text-white font-mono text-xs mb-4">
                             {MONTH_OPTIONS[month + 1]} {year}
                           </div>
-                          <div className="mb-8 border rounded border-white">
+                          <div className={classes.row}>
+                            <div className="font-mono text-xs text-gray-500">
+                              tag
+                            </div>
+                            <div className={`font-mono text-xs text-gray-500`}>
+                              amount
+                            </div>
+                            <div className={`font-mono text-xs text-gray-500`}>
+                              budget
+                            </div>
+                            <div className={`font-mono text-xs text-gray-500`}>
+                              diff
+                            </div>
+                            <div className="font-mono text-xs text-gray-500">
+                              transactions
+                            </div>
+                          </div>
+                          <div className="mb-8 border-t border-b border-gray-600">
                             {tags.map((tag) => {
                               const netTag = net(year, month, tag);
                               const rows = transactions(year, month, tag);
@@ -262,6 +332,9 @@ export default function Page() {
                                         }
                                       `}
                                       >
+                                        <div className="font-mono text-xs text-white">
+                                          {tag}
+                                        </div>
                                         <div
                                           className={`font-mono text-xs whitespace-pre ${
                                             netTag < 0
@@ -270,17 +343,28 @@ export default function Page() {
                                           }`}
                                         >
                                           {formatCurrency(netTag)}
-                                        </div>{" "}
-                                        <div className="font-mono text-xs text-white">
-                                          {tag}
                                         </div>
-                                        <div className="font-mono text-xs text-white">
+                                        <div
+                                          className={`font-mono text-xs whitespace-pre text-gray-500`}
+                                        >
+                                          {formatCurrency(budget[tag])}
+                                        </div>
+                                        <div
+                                          className={`font-mono text-xs whitespace-pre ${
+                                            netTag - budget[tag] < 0
+                                              ? "text-red-500"
+                                              : "text-green-500"
+                                          }`}
+                                        >
+                                          {formatCurrency(netTag - budget[tag])}
+                                        </div>
+                                        <div className="font-mono text-xs text-gray-500">
                                           {rows.length}
                                         </div>
                                       </div>
                                     }
                                   >
-                                    <div className="border-t border-b border-white my-2 py-2 max-h-64 overflow-scroll">
+                                    <div className="border-t border-b border-white max-h-64 overflow-scroll">
                                       {rows.map((transaction) => (
                                         <div
                                           key={transaction.hash}
@@ -318,6 +402,9 @@ export default function Page() {
                               );
                             })}
                             <div className={classes.row}>
+                              <div className="font-mono text-xs text-white">
+                                net
+                              </div>
                               <div
                                 className={`font-mono text-xs whitespace-pre ${
                                   netMonth < 0
@@ -327,8 +414,19 @@ export default function Page() {
                               >
                                 {formatCurrency(netMonth)}
                               </div>
-                              <div className="font-mono text-xs text-white">
-                                net
+                              <div
+                                className={`font-mono text-xs whitespace-pre text-gray-500`}
+                              >
+                                {formatCurrency(budget.net)}
+                              </div>
+                              <div
+                                className={`font-mono text-xs whitespace-pre ${
+                                  netMonth - budget.net < 0
+                                    ? "text-red-500"
+                                    : "text-green-500"
+                                }`}
+                              >
+                                {formatCurrency(netMonth - budget.net)}
                               </div>
                             </div>
                           </div>
