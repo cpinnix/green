@@ -2,20 +2,19 @@ import createStore from "bones/createStore";
 import * as actions from "./actions";
 import * as selectors from "./selectors";
 import createLogger from "utils/createLogger";
-import createTracer from "utils/createTracer";
 
 const log = createLogger("#B388FF", "[TRANSACTIONS]");
-const { createSpan } = createTracer(log);
 
 const DEFAULT_STATE = {
   query: "",
   transactions: [],
-  filteredTransactions: [],
-  budget: {},
-  tags: [],
+  budgets: [],
   selectedTag: "",
   selectedMonth: "",
   overrides: {},
+  demoMode: {
+    enabled: false,
+  },
 };
 
 export default function createInteractor({
@@ -48,7 +47,14 @@ export default function createInteractor({
     },
     selectors: {
       filteredTransactions: selectors.filteredTransactions,
+      transactionsFiltered: selectors.transactionsFiltered,
+      net: selectors.net,
       budget: selectors.budget,
+      transactions: selectors.transactions,
+      tagOptions: selectors.tagOptions,
+      tags: selectors.tags,
+      months: selectors.months,
+      years: selectors.years,
     },
   };
 }

@@ -3,17 +3,13 @@ import Head from "next/head";
 import Fade from "react-reveal/Fade";
 import useInteractors from "hooks/useInteractors";
 import createInteractors from "apps/transactions";
-import getYear from "date-fns/getYear";
-import getMonth from "date-fns/getMonth";
-import uniq from "lodash/uniq";
-import sumBy from "lodash/sumBy";
 import { MONTH_OPTIONS } from "apps/transactions/constants";
 import Navigation from "components/Navigation";
 import createLogger from "utils/createLogger";
 import createTracer from "utils/createTracer";
 import formatCurrency from "utils/formatCurrency";
-import { format } from "date-fns";
 import classes from "./index.module.css";
+import TransactionRow from "components/TransactionRow";
 
 const log = createLogger("#82B1FF", "[SUMMARY]");
 const { createSpan } = createTracer(log);
@@ -23,76 +19,34 @@ function present(interactors) {
 
   log("interactors", interactors);
 
-  const transactions = interactors.transactions.selectors.filteredTransactions(
-    interactors.transactions.state
-  );
-
-  const years = uniq(
-    transactions.map((transaction) => getYear(transaction.date))
-  );
-
-  const months = uniq(
-    transactions.map((transaction) => getMonth(transaction.date))
-  );
-
-  const tags = uniq(transactions.map((transaction) => transaction.tag));
-
   const presentation = {
     state: {
       loading: !interactors.transactions.state.initialized,
-      years,
-      months,
-      tags,
+      years: interactors.transactions.selectors.years(
+        interactors.transactions.state
+      ),
+      months: interactors.transactions.selectors.months(
+        interactors.transactions.state
+      ),
+      tags: interactors.transactions.selectors.tags(
+        interactors.transactions.state
+      ),
       budget: interactors.transactions.selectors.budget(
         interactors.transactions.state
       ),
     },
     selectors: {
       net(year, month, tag) {
-        let filteredTransactions = transactions;
-
-        if (year !== null && year !== undefined) {
-          filteredTransactions = filteredTransactions.filter(
-            (transaction) => getYear(transaction.date) === year
-          );
-        }
-
-        if (month !== null && month !== undefined) {
-          filteredTransactions = filteredTransactions.filter(
-            (transaction) => getMonth(transaction.date) === month
-          );
-        }
-
-        if (tag !== null && tag !== undefined) {
-          filteredTransactions = filteredTransactions.filter(
-            (transaction) => transaction.tag === tag
-          );
-        }
-
-        return sumBy(filteredTransactions, (transaction) => transaction.amount);
+        return interactors.transactions.selectors.net(
+          interactors.transactions.state,
+          { year, month, tag }
+        );
       },
       transactions(year, month, tag) {
-        let filteredTransactions = transactions;
-
-        if (year !== null && year !== undefined) {
-          filteredTransactions = filteredTransactions.filter(
-            (transaction) => getYear(transaction.date) === year
-          );
-        }
-
-        if (month !== null && month !== undefined) {
-          filteredTransactions = filteredTransactions.filter(
-            (transaction) => getMonth(transaction.date) === month
-          );
-        }
-
-        if (tag !== null && tag !== undefined) {
-          filteredTransactions = filteredTransactions.filter(
-            (transaction) => transaction.tag === tag
-          );
-        }
-
-        return filteredTransactions;
+        return interactors.transactions.selectors.transactionsFiltered(
+          interactors.transactions.state,
+          { year, month, tag }
+        );
       },
     },
   };
@@ -114,7 +68,7 @@ function Accordion({ header, children, enabled }) {
   );
 }
 
-export default function Page() {
+export default function SummaryPage() {
   const interactors = useInteractors(() => createInteractors());
 
   useEffect(() => {
@@ -218,35 +172,10 @@ export default function Page() {
                             >
                               <div className="border-t border-b border-white max-h-64 overflow-scroll">
                                 {rows.map((transaction) => (
-                                  <div
+                                  <TransactionRow
                                     key={transaction.hash}
-                                    className={classes.transaction}
-                                  >
-                                    <div
-                                      className={`font-mono text-xs text-white whitespace-pre ${
-                                        transaction.amount < 0
-                                          ? "text-red-500"
-                                          : "text-green-500"
-                                      }`}
-                                    >
-                                      {formatCurrency(transaction.amount)}
-                                    </div>
-                                    <div className="font-mono text-xs text-white">
-                                      {transaction.tag}
-                                    </div>
-                                    <div className="font-mono text-xs text-white overflow-x-hidden whitespace-nowrap">
-                                      {transaction.description}
-                                    </div>
-                                    <div className="font-mono text-xs text-white">
-                                      {format(
-                                        new Date(transaction.date),
-                                        "MMM dd yyyy"
-                                      )}
-                                    </div>
-                                    <div className="font-mono text-xs text-white">
-                                      {transaction.hash}
-                                    </div>
-                                  </div>
+                                    {...transaction}
+                                  />
                                 ))}
                               </div>
                             </Accordion>
@@ -359,35 +288,10 @@ export default function Page() {
                                   >
                                     <div className="border-t border-b border-white max-h-64 overflow-scroll">
                                       {rows.map((transaction) => (
-                                        <div
+                                        <TransactionRow
                                           key={transaction.hash}
-                                          className={classes.transaction}
-                                        >
-                                          <div
-                                            className={`font-mono text-xs text-white whitespace-pre ${
-                                              transaction.amount < 0
-                                                ? "text-red-500"
-                                                : "text-green-500"
-                                            }`}
-                                          >
-                                            {formatCurrency(transaction.amount)}
-                                          </div>
-                                          <div className="font-mono text-xs text-white">
-                                            {transaction.tag}
-                                          </div>
-                                          <div className="font-mono text-xs text-white overflow-x-hidden whitespace-nowrap">
-                                            {transaction.description}
-                                          </div>
-                                          <div className="font-mono text-xs text-white">
-                                            {format(
-                                              new Date(transaction.date),
-                                              "MMM dd yyyy"
-                                            )}
-                                          </div>
-                                          <div className="font-mono text-xs text-white">
-                                            {transaction.hash}
-                                          </div>
-                                        </div>
+                                          {...transaction}
+                                        />
                                       ))}
                                     </div>
                                   </Accordion>

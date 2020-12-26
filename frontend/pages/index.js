@@ -1,16 +1,14 @@
 import React, { useEffect } from "react";
 import Head from "next/head";
 import sum from "lodash/sum";
-import { format } from "date-fns";
 import { List, AutoSizer } from "react-virtualized";
 import Fade from "react-reveal/Fade";
 import useInteractors from "hooks/useInteractors";
 import createLogger from "utils/createLogger";
-import formatCurrency from "utils/formatCurrency";
 import createInteractors from "apps/transactions";
 import { MONTH_OPTIONS } from "apps/transactions/constants";
 import Navigation from "components/Navigation";
-import classes from "./index.module.css";
+import TransactionRow from "components/TransactionRow";
 
 const log = createLogger("#82B1FF", "[HOME]");
 
@@ -24,6 +22,9 @@ function present(interactors) {
   const presentation = {
     state: {
       ...state,
+      tagOptions: interactors.transactions.selectors.tagOptions(
+        interactors.transactions.state
+      ),
       loading: !interactors.transactions.state.initialized,
       filteredTransactions,
       count: filteredTransactions.length,
@@ -50,47 +51,20 @@ export default function Page() {
       query,
       count,
       net,
-      tags,
+      tagOptions,
       selectedTag,
       selectedMonth,
       filteredTransactions,
-      overrides,
     },
-    actions: { changeQuery, changeTag, changeMonth, changeDescription },
+    actions: { changeQuery, changeTag, changeMonth },
   } = present(interactors);
 
   const transactions = filteredTransactions;
 
   function rowRenderer({ index, key, style }) {
-    const transaction = transactions[index];
-
-    const content = (
-      <div className={classes.row}>
-        <div className="font-mono text-xs text-white">{transaction.tag}</div>
-        <div
-          className={`font-mono text-xs text-white whitespace-pre ${
-            transaction.amount < 0 ? "text-red-500" : "text-green-500"
-          }`}
-        >
-          {formatCurrency(transaction.amount)}
-        </div>
-        <input
-          value={overrides[transaction.hash] || transaction.description}
-          className="font-mono text-xs text-white bg-transparent focus:outline-none"
-          onChange={(e) => {
-            changeDescription(transaction.hash, e.target.value);
-          }}
-        />
-        <div className="font-mono text-xs text-white">
-          {format(new Date(transaction.date), "MMM dd yyyy")}
-        </div>
-        <div className="font-mono text-xs text-white">{transaction.hash}</div>
-      </div>
-    );
-
     return (
       <div key={key} style={style}>
-        {content}
+        <TransactionRow {...transactions[index]} />
       </div>
     );
   }
@@ -126,7 +100,7 @@ export default function Page() {
                       changeTag(e.target.value);
                     }}
                   >
-                    {tags.map((tag) => (
+                    {tagOptions.map((tag) => (
                       <option key={tag} value={tag}>
                         {tag}
                       </option>

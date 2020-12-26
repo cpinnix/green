@@ -56,14 +56,6 @@ export function initiate({
         "transaction decoration in `initiate`"
       );
 
-      let budget = budgets.reduce(
-        (acc, budget) => ({
-          ...acc,
-          [budget.tag]: budget.amount,
-        }),
-        {}
-      );
-
       let expressions = taggedExpressions
         .map((taggedExpression) => {
           const regex = new RegExp(taggedExpression.regex);
@@ -113,13 +105,6 @@ export function initiate({
         } duplicates`
       );
 
-      const tags = [
-        "",
-        ...uniq(
-          decoratedTransactions.map((transaction) => transaction.tag)
-        ).filter((tag) => tag),
-      ];
-
       if (demoMode.enabled) {
         decoratedTransactions = decoratedTransactions.map((transaction) => ({
           ...transaction,
@@ -130,14 +115,6 @@ export function initiate({
           ),
           hash: faker.helpers.shuffle(transaction.hash.split("")).join(""),
         }));
-
-        budget = Object.keys(budget).reduce(
-          (acc, key) => ({
-            ...acc,
-            [key]: Math.random() * budget[key],
-          }),
-          {}
-        );
       }
 
       endDecorationSpan();
@@ -146,8 +123,8 @@ export function initiate({
         ...store.getState(),
         initialized: true,
         transactions: decoratedTransactions,
-        budget,
-        tags,
+        budgets,
+        demoMode,
       });
     }
   };
