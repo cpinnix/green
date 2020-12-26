@@ -9,6 +9,8 @@
   },
   "dependencies": {
     "autoprefixer": "^10.1.0",
+    "d3-scale": "^3.2.3",
+    "d3-scale-chromatic": "^2.0.0",
     "date-fns": "^2.16.1",
     "faker": "^5.1.0",
     "lodash": "^4.17.20",
@@ -17,6 +19,7 @@
     "react": "17.0.1",
     "react-dom": "17.0.1",
     "react-reveal": "^1.2.2",
+    "react-sizeme": "^2.6.12",
     "react-virtualized": "^9.22.3",
     "tailwindcss": "^2.0.2"
   },

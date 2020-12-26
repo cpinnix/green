@@ -56,7 +56,7 @@ export function initiate({
         "transaction decoration in `initiate`"
       );
 
-      const budget = budgets.reduce(
+      let budget = budgets.reduce(
         (acc, budget) => ({
           ...acc,
           [budget.tag]: budget.amount,
@@ -130,6 +130,14 @@ export function initiate({
           ),
           hash: faker.helpers.shuffle(transaction.hash.split("")).join(""),
         }));
+
+        budget = Object.keys(budget).reduce(
+          (acc, key) => ({
+            ...acc,
+            [key]: Math.random() * budget[key],
+          }),
+          {}
+        );
       }
 
       endDecorationSpan();

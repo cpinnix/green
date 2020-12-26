@@ -25,6 +25,21 @@ export default function Navigation() {
           Transactions
         </a>
       </Link>
+      <Link href="/summary">
+        <a
+          className={`
+            font-mono
+            text-xs
+            text-white
+            ml-4
+            focus:outline-none
+            focus:text-blue-500
+            ${router.pathname.includes("/summary") ? "text-yellow-200" : ""}
+          `}
+        >
+          Summary
+        </a>
+      </Link>
       <Link href="/trends">
         <a
           className={`
@@ -37,7 +52,7 @@ export default function Navigation() {
             ${router.pathname.includes("/trends") ? "text-yellow-200" : ""}
           `}
         >
-          Summary
+          Trends
         </a>
       </Link>
     </div>
