@@ -1,6 +1,6 @@
 const fs = require("fs");
 const parse = require("csv-parse");
-const output = require("../green-output.json");
+const fromPairs = require("lodash/fromPairs");
 const { ApolloServer, gql } = require("apollo-server");
 
 function parseCSV(path) {
@@ -57,12 +57,13 @@ const typeDefs = gql`
 const resolvers = {
   Query: {
     transactions: async function () {
-      return JSON.parse(fs.readFileSync(output.transactions.json));
+      const _output = await parseCSV("../green-output.csv");
+      const output = fromPairs(_output);
+      return JSON.parse(fs.readFileSync(output.json));
     },
     taggedExpressions: async function () {
-      return JSON.parse(
-        fs.readFileSync("../green-tags.json")
-      ).map(([regex, tag]) => ({ regex, tag }));
+      const tags = await parseCSV("../green-tags.csv");
+      return tags.map(([regex, tag]) => ({ regex, tag }));
     },
     budgets: async function () {
       const table = await parseCSV("../green-budget.csv");

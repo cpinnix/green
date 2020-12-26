@@ -29,7 +29,7 @@ export function initiate({
       localStorage.actions.set("transactions.overrides", state.overrides);
       memoryStorage.actions.set(
         "transactions.state",
-        pick(state, ["transactions", "initialized", "tags", "budget"])
+        pick(state, ["transactions", "initialized", "budgets"])
       );
     });
 

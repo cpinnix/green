@@ -170,7 +170,7 @@ export default function SummaryPage() {
                                 </div>
                               }
                             >
-                              <div className="border-t border-b border-white max-h-64 overflow-scroll">
+                              <div className="border-t border-b border-white max-h-96 overflow-scroll">
                                 {rows.map((transaction) => (
                                   <TransactionRow
                                     key={transaction.hash}
@@ -286,7 +286,7 @@ export default function SummaryPage() {
                                       </div>
                                     }
                                   >
-                                    <div className="border-t border-b border-white max-h-64 overflow-scroll">
+                                    <div className="border-t border-b border-white max-h-96 overflow-scroll">
                                       {rows.map((transaction) => (
                                         <TransactionRow
                                           key={transaction.hash}
