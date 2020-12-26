@@ -19,10 +19,6 @@ function parseCSV(path) {
       }
     });
 
-    // parser.on("error", (err) => {
-    //   logger.error(err.message);
-    // });
-
     parser.on("end", () => {
       resolve(table);
     });
