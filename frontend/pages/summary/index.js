@@ -94,13 +94,13 @@ export default function SummaryPage() {
         </Head>
         <Navigation />
         {loading ? null : (
-          <div className="px-8 mt-8">
+          <div>
             {years.map((year) => {
               const netYear = net(year);
               return (
                 <div key={year}>
                   <Fade>
-                    <div className="text-white font-mono text-xs mb-4">
+                    <div className="text-white font-mono text-xs mb-4 px-3">
                       {year}
                     </div>
                     <div className={classes.row}>
@@ -214,8 +214,8 @@ export default function SummaryPage() {
                     return (
                       <div key={month}>
                         <Fade>
-                          <div className="text-white font-mono text-xs mb-4">
-                            {MONTH_OPTIONS[month + 1]} {year}
+                          <div className="text-white font-mono text-xs mb-4 px-3">
+                            {MONTH_OPTIONS[month]} {year}
                           </div>
                           <div className={classes.row}>
                             <div className="font-mono text-xs text-gray-500">

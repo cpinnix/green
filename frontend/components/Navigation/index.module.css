@@ -1,7 +1,8 @@
 .layout {
-  @apply px-8;
-  @apply py-4;
+  @apply px-2;
+  @apply py-2;
   @apply flex;
+  @apply space-x-4;
   @apply items-center;
 }
 

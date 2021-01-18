@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import Head from "next/head";
 import sum from "lodash/sum";
 import { List, AutoSizer } from "react-virtualized";
@@ -9,15 +9,14 @@ import createInteractors from "apps/transactions";
 import { MONTH_OPTIONS } from "apps/transactions/constants";
 import Navigation from "components/Navigation";
 import TransactionRow from "components/TransactionRow";
+import formatCurrency from "utils/formatCurrency";
 
 const log = createLogger("#82B1FF", "[HOME]");
 
 function present(interactors) {
-  const { state, actions, selectors } = interactors.transactions;
+  const { state, actions } = interactors.transactions;
 
   log("interactors", interactors);
-
-  const filteredTransactions = selectors.filteredTransactions(state);
 
   const presentation = {
     state: {
@@ -26,9 +25,9 @@ function present(interactors) {
         interactors.transactions.state
       ),
       loading: !interactors.transactions.state.initialized,
-      filteredTransactions,
-      count: filteredTransactions.length,
-      net: sum(filteredTransactions.map((transaction) => transaction.amount)),
+      years: interactors.transactions.selectors.years(
+        interactors.transactions.state
+      ),
     },
     actions,
   };
@@ -45,21 +44,27 @@ export default function Page() {
     interactors.transactions.actions.initiate();
   }, []);
 
+  const [year, changeYear] = useState("");
+
   const {
-    state: {
-      loading,
-      query,
-      count,
-      net,
-      tagOptions,
-      selectedTag,
-      selectedMonth,
-      filteredTransactions,
-    },
+    state: { loading, query, tagOptions, selectedTag, selectedMonth, years },
     actions: { changeQuery, changeTag, changeMonth },
   } = present(interactors);
 
-  const transactions = filteredTransactions;
+  const transactions = interactors.transactions.selectors.transactionsFiltered(
+    interactors.transactions.state,
+    {
+      year,
+      month: selectedMonth,
+      tag: selectedTag,
+      query,
+    }
+  );
+
+  log("transactions", { transactions, year, selectedMonth, selectedTag });
+
+  const count = transactions.length;
+  const net = sum(transactions.map((transaction) => transaction.amount));
 
   function rowRenderer({ index, key, style }) {
     return (
@@ -72,34 +77,26 @@ export default function Page() {
   return (
     <div className="h-screen">
       <Head>
-        <title>Green - Transactions</title>
+        <title>Transactions</title>
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <div className="flex flex-col h-full">
         <Navigation />
         {loading ? null : (
           <Fade>
-            <div className="px-8 flex flex-col h-full">
-              <div className="flex my-8">
-                <input
-                  placeholder="search"
-                  value={query}
-                  onChange={(e) => {
-                    changeQuery(e.target.value);
-                  }}
-                  className="flex-1 mr-4 font-mono text-xs py-2 border-b border-white block bg-transparent text-white focus:outline-none focus:border-blue-500"
-                />
-                <div className="bg-black border-b border-white font-mono text-xs text-white mr-4 flex items-center focus-within:border-blue-500">
-                  <div className="font-mono text-xs text-white">tag:</div>
+            <div className="flex flex-col h-full">
+              <div className="flex items-center space-x-2">
+                <div className="bg-black font-mono text-xs text-white flex items-center focus-within:border-blue-500 leading-none hover:bg-gray-900">
                   <select
-                    name="cars"
-                    id="cars"
+                    name="tags"
+                    id="tags"
                     value={selectedTag}
-                    className="pr-3 bg-transparent appearance-none focus:outline-none"
+                    className="p-3 bg-transparent appearance-none focus:outline-none cursor-pointer"
                     onChange={(e) => {
                       changeTag(e.target.value);
                     }}
                   >
+                    <option value="">select tag</option>
                     {tagOptions.map((tag) => (
                       <option key={tag} value={tag}>
                         {tag}
@@ -107,38 +104,71 @@ export default function Page() {
                     ))}
                   </select>
                 </div>
-                <div className="bg-black border-b border-white font-mono text-xs text-white flex items-center focus-within:border-blue-500">
-                  <div className="font-mono text-xs text-white">month:</div>
+                <div className="bg-black font-mono text-xs text-white flex items-center focus-within:border-blue-500 leading-none hover:bg-gray-900">
+                  <select
+                    name="year"
+                    id="year"
+                    value={year}
+                    className="p-3 bg-transparent appearance-none focus:outline-none cursor-pointer"
+                    onChange={(e) => {
+                      let newYear = e.target.value;
+                      if (newYear) {
+                        newYear = parseInt(newYear);
+                      }
+                      changeYear(newYear);
+                    }}
+                  >
+                    <option value="">select year</option>
+                    {years.map((year) => (
+                      <option key={year} value={year}>
+                        {year}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <div className="bg-black font-mono text-xs text-white flex items-center focus-within:border-blue-500 leading-none hover:bg-gray-900">
                   <select
                     name="month"
                     id="month"
                     value={selectedMonth}
-                    className="pr-3 bg-transparent appearance-none focus:outline-none"
+                    className="p-3 bg-transparent appearance-none focus:outline-none cursor-pointer"
                     onChange={(e) => {
-                      changeMonth(e.target.value);
+                      let newMonth = e.target.value;
+                      if (newMonth) {
+                        newMonth = parseInt(newMonth);
+                      }
+                      changeMonth(newMonth);
                     }}
                   >
-                    {MONTH_OPTIONS.map((month) => (
-                      <option key={month} value={month}>
+                    <option value="">select month</option>
+                    {MONTH_OPTIONS.map((month, index) => (
+                      <option key={month} value={index}>
                         {month}
                       </option>
                     ))}
                   </select>
                 </div>
+                <input
+                  placeholder="search"
+                  value={query}
+                  onChange={(e) => {
+                    changeQuery(e.target.value);
+                  }}
+                  className="flex-1 font-mono text-xs leading-none p-3 bg-transparent text-white focus:outline-none focus:text-blue-500 w-24 hover:bg-gray-900"
+                />
+                <div className="font-mono text-xs mb-0.5 text-white pr-2">
+                  <span
+                    className={`whitespace-pre ${
+                      net < 0 ? "text-red-500" : "text-green-500"
+                    }`}
+                  >
+                    {formatCurrency(net)}
+                  </span>{" "}
+                  net. {count} transactions.
+                </div>
               </div>
-              <div className="font-mono text-xs mb-2 text-white">
-                {count} transactions.{" "}
-                <span
-                  className={`${net < 0 ? "text-red-500" : "text-green-500"}`}
-                >
-                  {new Intl.NumberFormat("EN-US", {
-                    style: "currency",
-                    currency: "USD",
-                  }).format(net)}
-                </span>{" "}
-                net.
-              </div>
-              <div className="flex-1 mb-8">
+
+              <div className="flex-1">
                 <AutoSizer>
                   {({ height, width }) => (
                     <List
@@ -147,7 +177,7 @@ export default function Page() {
                       rowCount={transactions.length}
                       rowHeight={32}
                       rowRenderer={rowRenderer}
-                      className="border-t border-b border-gray-600 focus:outline-none focus-within:border-blue-500"
+                      className="border-t border-gray-600 focus:outline-none focus:border-blue-500"
                       overscanRowCount={100}
                     />
                   )}

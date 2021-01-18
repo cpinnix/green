@@ -13,4 +13,4 @@ export const MONTH_MAP = {
   dec: "11",
 };
 
-export const MONTH_OPTIONS = ["", ...Object.keys(MONTH_MAP)];
+export const MONTH_OPTIONS = Object.keys(MONTH_MAP);

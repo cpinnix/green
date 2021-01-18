@@ -41,7 +41,7 @@ export function initiate({
 
     if (!storedState.initialized) {
       const endFetchSpan = createSpan("total fetch time in `initiate`");
-      const [transactions, taggedExpressions, budgets] = await Promise.all([
+      let [transactions, taggedExpressions, budgets] = await Promise.all([
         gateway.fetchTransactions(),
         gateway.fetchTaggedExpressions(),
         gateway.fetchBudgets(),
@@ -114,6 +114,11 @@ export function initiate({
               .length
           ),
           hash: faker.helpers.shuffle(transaction.hash.split("")).join(""),
+        }));
+
+        budgets = budgets.map((budget) => ({
+          ...budget,
+          amount: Math.round(Math.random() * budget.amount),
         }));
       }
 

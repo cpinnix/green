@@ -40,30 +40,26 @@ export function filteredTransactions(state) {
 }
 
 export function transactionsFiltered(state, { year, month, tag, query }) {
-  // const endSpan = createSpan("`transactionsFiltered`");
-
   let table = transactions(state);
 
-  if (year !== null && year !== undefined) {
+  if (year !== null && year !== undefined && year !== "") {
     table = table.filter((transaction) => getYear(transaction.date) === year);
   }
 
-  if (month !== null && month !== undefined) {
+  if (month !== null && month !== undefined && month !== "") {
     table = table.filter((transaction) => getMonth(transaction.date) === month);
   }
 
-  if (tag !== null && tag !== undefined) {
+  if (tag !== null && tag !== undefined && tag !== "") {
     table = table.filter((transaction) => transaction.tag === tag);
   }
 
-  if (query !== null && query !== undefined) {
+  if (query !== null && query !== undefined && query !== "") {
     table = table.filter((transaction) => {
       const description = transaction.description;
       return description.toLowerCase().includes(query.toLowerCase());
     });
   }
-
-  // endSpan();
 
   return table;
 }
@@ -108,12 +104,9 @@ export function budget(state) {
 
 export function tagOptions(state) {
   const endSpan = createSpan("`tagOptions`");
-  const tagOptions = [
-    "",
-    ...uniq(state.transactions.map((transaction) => transaction.tag)).filter(
-      (tag) => tag
-    ),
-  ];
+  const tagOptions = uniq(
+    state.transactions.map((transaction) => transaction.tag)
+  ).filter((tag) => tag);
   endSpan();
   return tagOptions;
 }
