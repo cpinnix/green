@@ -89,7 +89,7 @@ export default function SummaryPage() {
     >
       <div>
         <Head>
-          <title>Green - Trends</title>
+          <title>Summary</title>
           <link rel="icon" href="/favicon.ico" />
         </Head>
         <Navigation />
