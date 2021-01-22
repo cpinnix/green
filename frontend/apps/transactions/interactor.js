@@ -40,10 +40,6 @@ export default function createInteractor({
         memoryStorage,
         unsubscribe,
       }),
-      changeQuery: actions.changeQuery({ store }),
-      changeTag: actions.changeTag({ store }),
-      changeMonth: actions.changeMonth({ store }),
-      changeDescription: actions.changeDescription({ store }),
     },
     selectors: {
       filteredTransactions: selectors.filteredTransactions,

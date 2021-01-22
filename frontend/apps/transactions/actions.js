@@ -1,5 +1,4 @@
 import uniqBy from "lodash/uniqBy";
-import uniq from "lodash/uniq";
 import pick from "lodash/pick";
 import createLogger from "utils/createLogger";
 import createTracer from "utils/createTracer";
@@ -132,45 +131,5 @@ export function initiate({
         demoMode,
       });
     }
-  };
-}
-
-export function changeQuery({ store }) {
-  return function (query) {
-    store.setState({
-      ...store.getState(),
-      query,
-    });
-  };
-}
-
-export function changeTag({ store }) {
-  return function (tag) {
-    store.setState({
-      ...store.getState(),
-      selectedTag: tag,
-    });
-  };
-}
-
-export function changeMonth({ store }) {
-  return function (month) {
-    store.setState({
-      ...store.getState(),
-      selectedMonth: month,
-    });
-  };
-}
-
-export function changeDescription({ store }) {
-  return function (hash, description) {
-    log("change", hash, description);
-    store.setState({
-      ...store.getState(),
-      overrides: {
-        ...store.getState().overrides,
-        [hash]: description,
-      },
-    });
   };
 }

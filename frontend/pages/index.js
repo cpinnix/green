@@ -84,9 +84,10 @@ export default function Page() {
         <Navigation />
         {loading ? null : (
           <Fade>
-            <div className="flex flex-col h-full">
+            <div className="px-8 h-full">
+              <div className="flex flex-col h-full bg-grey-900">
               <div className="flex items-center space-x-2">
-                <div className="bg-black font-mono text-xs text-white flex items-center focus-within:border-blue-500 leading-none hover:bg-gray-900">
+                  <div className="font-mono text-xs text-white flex items-center focus-within:border-blue-500 leading-none">
                   <select
                     name="tags"
                     id="tags"
@@ -104,7 +105,7 @@ export default function Page() {
                     ))}
                   </select>
                 </div>
-                <div className="bg-black font-mono text-xs text-white flex items-center focus-within:border-blue-500 leading-none hover:bg-gray-900">
+                  <div className="font-mono text-xs text-white flex items-center focus-within:border-blue-500 leading-none">
                   <select
                     name="year"
                     id="year"
@@ -126,7 +127,7 @@ export default function Page() {
                     ))}
                   </select>
                 </div>
-                <div className="bg-black font-mono text-xs text-white flex items-center focus-within:border-blue-500 leading-none hover:bg-gray-900">
+                  <div className="font-mono text-xs text-white flex items-center focus-within:border-blue-500 leading-none">
                   <select
                     name="month"
                     id="month"
@@ -154,7 +155,7 @@ export default function Page() {
                   onChange={(e) => {
                     changeQuery(e.target.value);
                   }}
-                  className="flex-1 font-mono text-xs leading-none p-3 bg-transparent text-white focus:outline-none focus:text-blue-500 w-24 hover:bg-gray-900"
+                    className="flex-1 font-mono text-xs leading-none p-3 bg-transparent text-white focus:outline-none focus:text-blue-500 w-24"
                 />
                 <div className="font-mono text-xs mb-0.5 text-white pr-2">
                   <span
@@ -177,12 +178,13 @@ export default function Page() {
                       rowCount={transactions.length}
                       rowHeight={32}
                       rowRenderer={rowRenderer}
-                      className="border-t border-gray-600 focus:outline-none focus:border-blue-500"
+                        className="bg-grey-1000 focus:outline-none focus:border-blue-500"
                       overscanRowCount={100}
                     />
                   )}
                 </AutoSizer>
               </div>
+            </div>
             </div>
           </Fade>
         )}

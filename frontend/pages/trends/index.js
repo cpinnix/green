@@ -52,61 +52,62 @@ function Scatterplot({ tags, table, y, x }) {
     <div>
       {table.length > 0 && (
         <Fade>
-          <div className="font-mono text-xs text-white px-8 mb-4">2020</div>
-          <div className="px-8">
-            <div className="h-px bg-gray-500" />
-          </div>
-          <Size monitorHeight>
-            {({ size }) => {
-              var PADDING = 32;
-              const RADIUS = 4;
-              const xRange = [0, size.width - PADDING * 2 - RADIUS * 2];
-              const yRange = [0, size.height - PADDING * 2 - RADIUS * 2];
+          <div className="bg-grey-1000">
+            <div className="font-mono text-xs text-white mb-4 p-4">2020</div>
+            <Size monitorHeight>
+              {({ size }) => {
+                var PADDING = 48;
+                const RADIUS = 4;
+                const xRange = [0, size.width - PADDING * 2 - RADIUS * 2];
+                const yRange = [0, size.height - PADDING * 2 - RADIUS * 2];
 
-              var xScale = scaleTime().domain(x.domain).range(xRange);
-              var yScale = scaleLinear().domain(y.domain).range(yRange);
+                var xScale = scaleTime().domain(x.domain).range(xRange);
+                var yScale = scaleLinear().domain(y.domain).range(yRange);
 
-              return (
-                <div style={{ height: "40rem" }}>
-                  <div className="font-mono text-xs text-white">
-                    <svg viewBox={`0 0 ${size.width} ${size.height}`}>
-                      {table.map((row, index) => (
-                        <circle
-                          key={index}
-                          cx={xScale(toDate(row.date)) + PADDING + RADIUS}
-                          cy={yScale(row.amount) + PADDING + RADIUS}
-                          r={RADIUS}
-                          strokeWidth={2}
-                          stroke={
-                            hoveredRow && row.tag === hoveredRow.tag
-                              ? interpolateSinebow(
-                                  tags.findIndex((tag) => tag === row.tag) /
-                                    tags.length
-                                )
-                              : interpolateSinebow(
-                                  tags.findIndex((tag) => tag === row.tag) /
-                                    tags.length
-                                )
-                          }
-                          style={{
-                            opacity:
-                              hoveredRow && row.tag !== hoveredRow.tag ? 0 : 1,
-                          }}
-                          onMouseEnter={() => updateHoveredRow(row)}
-                          onMouseLeave={() => updateHoveredRow(null)}
-                        />
-                      ))}
-                    </svg>
+                return (
+                  <div style={{ height: "40rem" }}>
+                    <div className="font-mono text-xs text-white">
+                      <svg viewBox={`0 0 ${size.width} ${size.height}`}>
+                        {table.map((row, index) => (
+                          <circle
+                            key={index}
+                            cx={xScale(toDate(row.date)) + PADDING + RADIUS}
+                            cy={yScale(row.amount) + PADDING + RADIUS}
+                            r={RADIUS}
+                            fill={
+                              hoveredRow && row.tag === hoveredRow.tag
+                                ? interpolateSinebow(
+                                    tags.findIndex((tag) => tag === row.tag) /
+                                      tags.length
+                                  )
+                                : interpolateSinebow(
+                                    tags.findIndex((tag) => tag === row.tag) /
+                                      tags.length
+                                  )
+                            }
+                            className="transition-opacity duration-300 ease-in-out"
+                            style={{
+                              opacity:
+                                hoveredRow && row.tag !== hoveredRow.tag
+                                  ? 0
+                                  : 1,
+                            }}
+                            onMouseEnter={() => updateHoveredRow(row)}
+                            onMouseLeave={() => updateHoveredRow(null)}
+                          />
+                        ))}
+                      </svg>
+                    </div>
                   </div>
-                </div>
-              );
-            }}
-          </Size>
-          <div className="px-8">
-            <div className="h-px bg-gray-500" />
-          </div>
-          <div className="px-8">
-            {hoveredRow && <TransactionRow {...hoveredRow} />}
+                );
+              }}
+            </Size>
+            <div
+              className="px-8 h-8 transition-opacity duration-300 ease-in-out"
+              style={{ opacity: hoveredRow ? 1 : 0 }}
+            >
+              {hoveredRow && <TransactionRow {...hoveredRow} />}
+            </div>
           </div>
         </Fade>
       )}
@@ -150,8 +151,9 @@ export default function Page() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <Navigation />
-      <div className="h-8" />
-      <Scatterplot tags={tags} x={x} y={y} table={table} />
+      <div className="px-8">
+        <Scatterplot tags={tags} x={x} y={y} table={table} />
+      </div>
     </div>
   );
 }

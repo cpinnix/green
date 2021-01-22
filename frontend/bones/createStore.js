@@ -1,4 +1,5 @@
 import createObservable from "bones/createObservable";
+import cloneDeep from "lodash/cloneDeep";
 
 export default function createStore(initialState = null) {
   let state = initialState;
@@ -10,16 +11,16 @@ export default function createStore(initialState = null) {
   }
 
   function getState() {
-    return state;
+    return cloneDeep(state);
   }
 
   function subscribe(fn) {
-    return observable.subscribe((state) => fn(state));
+    return observable.subscribe((state) => fn(cloneDeep(state)));
   }
 
   function connect(fn) {
-    fn(state);
-    return observable.subscribe((state) => fn(state));
+    fn(cloneDeep(state));
+    return observable.subscribe((state) => fn(cloneDeep(state)));
   }
 
   return {

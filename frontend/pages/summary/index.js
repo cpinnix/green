@@ -94,116 +94,117 @@ export default function SummaryPage() {
         </Head>
         <Navigation />
         {loading ? null : (
-          <div>
+          <div className="px-8">
             {years.map((year) => {
               const netYear = net(year);
               return (
                 <div key={year}>
                   <Fade>
-                    <div className="text-white font-mono text-xs mb-4 px-3">
-                      {year}
-                    </div>
-                    <div className={classes.row}>
-                      <div className="font-mono text-xs text-gray-500">tag</div>
-                      <div className={`font-mono text-xs text-gray-500`}>
-                        amount
+                    <div className="bg-grey-900">
+                      <div className="text-white font-mono text-xs mb-4 p-3 pb-0">
+                        {year}
                       </div>
-                      <div className={`font-mono text-xs text-gray-500`}>
-                        budget
-                      </div>
-                      <div className={`font-mono text-xs text-gray-500`}>
-                        diff
-                      </div>
-
-                      <div className="font-mono text-xs text-gray-500">
-                        transactions
-                      </div>
-                    </div>
-                    <div className="mb-8 border-t border-b border-gray-600">
-                      {tags.map((tag) => {
-                        const netTag = net(year, null, tag);
-                        const rows = transactions(year, null, tag);
-                        return (
-                          <div key={tag}>
-                            <Accordion
-                              enabled={rows.length > 0}
-                              header={
-                                <div
-                                  className={`
-                                  ${classes.row}
-                                  ${
-                                    rows.length > 0
-                                      ? "cursor-pointer hover:bg-gray-900"
-                                      : ""
-                                  }
-                                `}
-                                >
-                                  <div className="font-mono text-xs text-white">
-                                    {tag}
-                                  </div>
-                                  <div
-                                    className={`font-mono text-xs whitespace-pre ${
-                                      netTag < 0
-                                        ? "text-red-500"
-                                        : "text-green-500"
-                                    }`}
-                                  >
-                                    {formatCurrency(netTag)}
-                                  </div>
-                                  <div
-                                    className={`font-mono text-xs whitespace-pre text-gray-500`}
-                                  >
-                                    {formatCurrency(budget[tag] * 12)}
-                                  </div>
-                                  <div
-                                    className={`font-mono text-xs whitespace-pre ${
-                                      netTag - budget[tag] * 12 < 0
-                                        ? "text-red-500"
-                                        : "text-green-500"
-                                    }`}
-                                  >
-                                    {formatCurrency(netTag - budget[tag] * 12)}
-                                  </div>
-                                  <div className="font-mono text-xs text-gray-500">
-                                    {rows.length}
-                                  </div>
-                                </div>
-                              }
-                            >
-                              <div className="border-t border-b border-white max-h-96 overflow-scroll">
-                                {rows.map((transaction) => (
-                                  <TransactionRow
-                                    key={transaction.hash}
-                                    {...transaction}
-                                  />
-                                ))}
-                              </div>
-                            </Accordion>
-                          </div>
-                        );
-                      })}
                       <div className={classes.row}>
-                        <div className="font-mono text-xs text-white">net</div>
-                        <div
-                          className={`font-mono text-xs whitespace-pre ${
-                            netYear < 0 ? "text-red-500" : "text-green-500"
-                          }`}
-                        >
-                          {formatCurrency(netYear)}
+                        <div className="font-mono text-xs text-white">tag</div>
+                        <div className={`font-mono text-xs text-white`}>
+                          amount
                         </div>
-                        <div
-                          className={`font-mono text-xs whitespace-pre text-gray-500`}
-                        >
-                          {formatCurrency(budget.net * 12)}
+                        <div className={`font-mono text-xs text-white`}>
+                          budget
                         </div>
-                        <div
-                          className={`font-mono text-xs whitespace-pre ${
-                            netYear - budget.net * 12 < 0
-                              ? "text-red-500"
-                              : "text-green-500"
-                          }`}
-                        >
-                          {formatCurrency(netYear - budget.net * 12)}
+                        <div className={`font-mono text-xs text-white`}>
+                          diff
+                        </div>
+                        <div className="font-mono text-xs text-white">
+                          transactions
+                        </div>
+                      </div>
+                      <div className="mb-8 bg-grey-1000">
+                        {tags.map((tag) => {
+                          const netTag = net(year, null, tag);
+                          const rows = transactions(year, null, tag);
+                          return (
+                            <div key={tag}>
+                              <Accordion
+                                enabled={rows.length > 0}
+                                header={
+                                  <div
+                                    className={`
+                                  ${classes.row}
+                                  ${rows.length > 0 ? "cursor-pointer" : ""}
+                                `}
+                                  >
+                                    <div className="font-mono text-xs text-white">
+                                      {tag}
+                                    </div>
+                                    <div
+                                      className={`font-mono text-xs whitespace-pre ${
+                                        netTag < 0
+                                          ? "text-red-500"
+                                          : "text-green-500"
+                                      }`}
+                                    >
+                                      {formatCurrency(netTag)}
+                                    </div>
+                                    <div
+                                      className={`font-mono text-xs whitespace-pre text-gray-500`}
+                                    >
+                                      {formatCurrency(budget[tag] * 12)}
+                                    </div>
+                                    <div
+                                      className={`font-mono text-xs whitespace-pre ${
+                                        netTag - budget[tag] * 12 < 0
+                                          ? "text-red-500"
+                                          : "text-green-500"
+                                      }`}
+                                    >
+                                      {formatCurrency(
+                                        netTag - budget[tag] * 12
+                                      )}
+                                    </div>
+                                    <div className="font-mono text-xs text-gray-500">
+                                      {rows.length}
+                                    </div>
+                                  </div>
+                                }
+                              >
+                                <div className="bg-grey-900 max-h-96 overflow-scroll">
+                                  {rows.map((transaction) => (
+                                    <TransactionRow
+                                      key={transaction.hash}
+                                      {...transaction}
+                                    />
+                                  ))}
+                                </div>
+                              </Accordion>
+                            </div>
+                          );
+                        })}
+                        <div className={classes.row}>
+                          <div className="font-mono text-xs text-white">
+                            net
+                          </div>
+                          <div
+                            className={`font-mono text-xs whitespace-pre ${
+                              netYear < 0 ? "text-red-500" : "text-green-500"
+                            }`}
+                          >
+                            {formatCurrency(netYear)}
+                          </div>
+                          <div
+                            className={`font-mono text-xs whitespace-pre text-gray-500`}
+                          >
+                            {formatCurrency(budget.net * 12)}
+                          </div>
+                          <div
+                            className={`font-mono text-xs whitespace-pre ${
+                              netYear - budget.net * 12 < 0
+                                ? "text-red-500"
+                                : "text-green-500"
+                            }`}
+                          >
+                            {formatCurrency(netYear - budget.net * 12)}
+                          </div>
                         </div>
                       </div>
                     </div>
@@ -214,27 +215,27 @@ export default function SummaryPage() {
                     return (
                       <div key={month}>
                         <Fade>
-                          <div className="text-white font-mono text-xs mb-4 px-3">
-                            {MONTH_OPTIONS[month]} {year}
-                          </div>
-                          <div className={classes.row}>
-                            <div className="font-mono text-xs text-gray-500">
-                              tag
+                          <div className="bg-grey-1000 py-8 mb-8">
+                            <div className="text-white font-mono text-xs mb-4 px-8">
+                              {MONTH_OPTIONS[month]} {year}
                             </div>
-                            <div className={`font-mono text-xs text-gray-500`}>
-                              amount
+                            <div className={classes.row}>
+                              <div className="font-mono text-xs text-white">
+                                tag
+                              </div>
+                              <div className={`font-mono text-xs text-white`}>
+                                amount
+                              </div>
+                              <div className={`font-mono text-xs text-white`}>
+                                budget
+                              </div>
+                              <div className={`font-mono text-xs text-white`}>
+                                diff
+                              </div>
+                              <div className="font-mono text-xs text-white">
+                                transactions
+                              </div>
                             </div>
-                            <div className={`font-mono text-xs text-gray-500`}>
-                              budget
-                            </div>
-                            <div className={`font-mono text-xs text-gray-500`}>
-                              diff
-                            </div>
-                            <div className="font-mono text-xs text-gray-500">
-                              transactions
-                            </div>
-                          </div>
-                          <div className="mb-8 border-t border-b border-gray-600">
                             {tags.map((tag) => {
                               const netTag = net(year, month, tag);
                               const rows = transactions(year, month, tag);
@@ -249,7 +250,7 @@ export default function SummaryPage() {
                                         ${classes.row}
                                         ${
                                           rows.length > 0
-                                            ? "cursor-pointer hover:bg-gray-900"
+                                            ? "cursor-pointer"
                                             : ""
                                         }
                                       `}
@@ -286,7 +287,7 @@ export default function SummaryPage() {
                                       </div>
                                     }
                                   >
-                                    <div className="border-t border-b border-white max-h-96 overflow-scroll">
+                                    <div className="bg-grey-900 max-h-96 overflow-scroll">
                                       {rows.map((transaction) => (
                                         <TransactionRow
                                           key={transaction.hash}
