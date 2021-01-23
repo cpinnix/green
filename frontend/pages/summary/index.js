@@ -100,8 +100,8 @@ export default function SummaryPage() {
               return (
                 <div key={year}>
                   <Fade>
-                    <div className="bg-grey-900">
-                      <div className="text-white font-mono text-xs mb-4 p-3 pb-0">
+                    <div className="bg-grey-1000 py-8 mb-8">
+                      <div className="text-white font-mono text-xs mb-4 px-8">
                         {year}
                       </div>
                       <div className={classes.row}>
@@ -119,7 +119,7 @@ export default function SummaryPage() {
                           transactions
                         </div>
                       </div>
-                      <div className="mb-8 bg-grey-1000">
+                      <div className="bg-grey-1000">
                         {tags.map((tag) => {
                           const netTag = net(year, null, tag);
                           const rows = transactions(year, null, tag);

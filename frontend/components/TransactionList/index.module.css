@@ -1,0 +1,9 @@
+.row {
+  height: 32px;
+  align-items: center;
+  display: grid;
+  gap: 2rem;
+  grid-template-columns: min-content 8rem auto max-content min-content;
+
+  @apply px-8;
+}

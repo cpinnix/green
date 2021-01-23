@@ -1,0 +1,20 @@
+.row {
+  height: 32px;
+  align-items: center;
+  display: grid;
+  gap: 2rem;
+  grid-template-columns: 8rem 8rem 8rem auto max-content;
+
+  @apply px-8;
+}
+
+.transaction {
+  height: 32px;
+  align-items: center;
+  display: grid;
+  gap: 2rem;
+  grid-template-columns: 8rem auto max-content min-content;
+
+  @apply pl-48;
+  @apply pr-8;
+}
