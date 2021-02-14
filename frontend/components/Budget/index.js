@@ -9,7 +9,7 @@ import { SizeMe as Size } from "react-sizeme";
 import { useSelector } from "react-redux";
 import * as selectors from "apps/core/selectors";
 
-export default function Budget() {
+export default function Budget({ height }) {
   const loading = useSelector(selectors.loading);
   const tags = useSelector(selectors.tags);
   const months = useSelector(selectors.months);
@@ -32,15 +32,15 @@ export default function Budget() {
           const ID = "budget-tooltip";
 
           return (
-            <div className="bg-grey-1000" style={{ padding: PADDING }}>
+            <div className="bg-grey-1000" style={{ padding: PADDING, height }}>
               <div className="flex items-center mb-2">
-                <div className="text-xs font-mono text-grey-700">budget</div>
+                <div className="text-2xs font-mono text-grey-700">budget</div>
                 <div className="flex-1" />
                 <select
                   name="month"
                   id="month"
                   value={month}
-                  className="bg-transparent appearance-none focus:outline-none cursor-pointer text-white font-mono text-xs"
+                  className="bg-transparent appearance-none focus:outline-none cursor-pointer text-white font-mono text-2xs"
                   onChange={(e) => {
                     let newMonth = e.target.value;
                     if (newMonth) {
@@ -59,7 +59,7 @@ export default function Budget() {
                   name="year"
                   id="year"
                   value={year}
-                  className="p-3 bg-transparent appearance-none focus:outline-none cursor-pointer text-white font-mono text-xs"
+                  className="p-3 bg-transparent appearance-none focus:outline-none cursor-pointer text-white font-mono text-2xs"
                   onChange={(e) => {
                     let newYear = e.target.value;
                     if (newYear) {
@@ -102,7 +102,7 @@ export default function Budget() {
                   return (
                     <div
                       key={tag}
-                      className="font-mono text-xs text-white flex overflow-hidden"
+                      className="font-mono text-2xs text-white flex overflow-hidden"
                       data-tip={`${displayNet} of ${displayBudget} ${tag}`}
                       data-for={ID}
                     >

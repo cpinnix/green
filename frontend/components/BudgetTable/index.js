@@ -45,7 +45,7 @@ export default function BudgetTable() {
             name="month"
             id="month"
             value={month}
-            className="bg-transparent appearance-none focus:outline-none cursor-pointer text-white font-mono text-xs"
+            className="bg-transparent appearance-none focus:outline-none cursor-pointer text-white font-mono text-2xs"
             onChange={(e) => {
               let newMonth = e.target.value;
               if (newMonth) {
@@ -65,7 +65,7 @@ export default function BudgetTable() {
             name="year"
             id="year"
             value={year}
-            className="p-3 bg-transparent appearance-none focus:outline-none cursor-pointer text-white font-mono text-xs"
+            className="p-3 bg-transparent appearance-none focus:outline-none cursor-pointer text-white font-mono text-2xs"
             onChange={(e) => {
               let newYear = e.target.value;
               if (newYear) {
@@ -82,11 +82,11 @@ export default function BudgetTable() {
           </select>
         </div>
         <div className={classes.row}>
-          <div className="font-mono text-xs text-white">tag</div>
-          <div className={`font-mono text-xs text-white`}>amount</div>
-          <div className={`font-mono text-xs text-white`}>budget</div>
-          <div className={`font-mono text-xs text-white`}>diff</div>
-          <div className="font-mono text-xs text-white">transactions</div>
+          <div className="font-mono text-2xs text-white">tag</div>
+          <div className={`font-mono text-2xs text-white`}>amount</div>
+          <div className={`font-mono text-2xs text-white`}>budget</div>
+          <div className={`font-mono text-2xs text-white`}>diff</div>
+          <div className="font-mono text-2xs text-white">transactions</div>
         </div>
         <div className="bg-grey-1000">
           {tags.map((tag) => {
@@ -104,21 +104,21 @@ export default function BudgetTable() {
                         ${rows.length > 0 ? "cursor-pointer" : ""}
                       `}
                     >
-                      <div className="font-mono text-xs text-white">{tag}</div>
+                      <div className="font-mono text-2xs text-white">{tag}</div>
                       <div
-                        className={`font-mono text-xs whitespace-pre ${
+                        className={`font-mono text-2xs whitespace-pre ${
                           netTag < 0 ? "text-red-500" : "text-green-500"
                         }`}
                       >
                         {formatCurrency(netTag)}
                       </div>
                       <div
-                        className={`font-mono text-xs whitespace-pre text-gray-500`}
+                        className={`font-mono text-2xs whitespace-pre text-gray-500`}
                       >
                         {formatCurrency(budget[tag] * multiplier)}
                       </div>
                       <div
-                        className={`font-mono text-xs whitespace-pre ${
+                        className={`font-mono text-2xs whitespace-pre ${
                           netTag - budget[tag] * multiplier < 0
                             ? "text-red-500"
                             : "text-green-500"
@@ -126,7 +126,7 @@ export default function BudgetTable() {
                       >
                         {formatCurrency(netTag - budget[tag] * multiplier)}
                       </div>
-                      <div className="font-mono text-xs text-gray-500">
+                      <div className="font-mono text-2xs text-gray-500">
                         {rows.length}
                       </div>
                     </div>
@@ -137,19 +137,19 @@ export default function BudgetTable() {
                       ({ amount, tag, date, description, hash }, index) => (
                         <div key={index} className={classes.transaction}>
                           <div
-                            className={`font-mono text-xs text-white whitespace-pre ${
+                            className={`font-mono text-2xs text-white whitespace-pre ${
                               amount < 0 ? "text-red-500" : "text-green-500"
                             }`}
                           >
                             {formatCurrency(amount)}
                           </div>
-                          <div className="font-mono text-xs text-white overflow-x-hidden whitespace-nowrap">
+                          <div className="font-mono text-2xs text-white overflow-x-hidden whitespace-nowrap">
                             {description}
                           </div>
-                          <div className="font-mono text-xs text-white">
+                          <div className="font-mono text-2xs text-white">
                             {formatDate(new Date(date), "MMM dd yyyy")}
                           </div>
-                          <div className="font-mono text-xs text-white">
+                          <div className="font-mono text-2xs text-white">
                             {hash}
                           </div>
                         </div>
@@ -161,19 +161,19 @@ export default function BudgetTable() {
             );
           })}
           <div className={classes.row}>
-            <div className="font-mono text-xs text-white">net</div>
+            <div className="font-mono text-2xs text-white">net</div>
             <div
-              className={`font-mono text-xs whitespace-pre ${
+              className={`font-mono text-2xs whitespace-pre ${
                 net < 0 ? "text-red-500" : "text-green-500"
               }`}
             >
               {formatCurrency(net)}
             </div>
-            <div className={`font-mono text-xs whitespace-pre text-gray-500`}>
+            <div className={`font-mono text-2xs whitespace-pre text-gray-500`}>
               {formatCurrency(budget.net * multiplier)}
             </div>
             <div
-              className={`font-mono text-xs whitespace-pre ${
+              className={`font-mono text-2xs whitespace-pre ${
                 net - budget.net * multiplier < 0
                   ? "text-red-500"
                   : "text-green-500"

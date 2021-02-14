@@ -39,20 +39,20 @@ export default function TransactionList({ height }) {
       <div key={key} style={style}>
         <div className={classes.row}>
           <div
-            className={`font-mono text-xs text-white whitespace-pre ${
+            className={`font-mono text-2xs text-white whitespace-pre ${
               amount < 0 ? "text-red-500" : "text-green-500"
             }`}
           >
             {formatCurrency(amount)}
           </div>
-          <div className="font-mono text-xs text-white">{tag}</div>
-          <div className="font-mono text-xs text-white overflow-x-hidden whitespace-nowrap">
+          <div className="font-mono text-2xs text-white">{tag}</div>
+          <div className="font-mono text-2xs text-white overflow-x-hidden whitespace-nowrap">
             {description}
           </div>
-          <div className="font-mono text-xs text-white">
+          <div className="font-mono text-2xs text-white">
             {formatDate(new Date(date), "MMM dd yyyy")}
           </div>
-          <div className="font-mono text-xs text-white">{hash}</div>
+          <div className="font-mono text-2xs text-white">{hash}</div>
         </div>
       </div>
     );
@@ -67,7 +67,7 @@ export default function TransactionList({ height }) {
               name="month"
               id="month"
               value={month}
-              className="bg-transparent appearance-none focus:border-blue-500 focus:outline-none cursor-pointer font-mono text-xs text-white leading-none"
+              className="bg-transparent appearance-none focus:border-blue-500 focus:outline-none cursor-pointer font-mono text-2xs text-white leading-none"
               onChange={(e) => {
                 let newMonth = e.target.value;
                 if (newMonth) {
@@ -87,7 +87,7 @@ export default function TransactionList({ height }) {
               name="year"
               id="year"
               value={year}
-              className="bg-transparent appearance-none focus:border-blue-500 focus:outline-none cursor-pointer font-mono text-xs text-white leading-none"
+              className="bg-transparent appearance-none focus:border-blue-500 focus:outline-none cursor-pointer font-mono text-2xs text-white leading-none"
               onChange={(e) => {
                 let newYear = e.target.value;
                 if (newYear) {
@@ -107,7 +107,7 @@ export default function TransactionList({ height }) {
               name="tags"
               id="tags"
               value={tag}
-              className="bg-transparent appearance-none focus:border-blue-500 focus:outline-none cursor-pointer font-mono text-xs text-white leading-none"
+              className="bg-transparent appearance-none focus:border-blue-500 focus:outline-none cursor-pointer font-mono text-2xs text-white leading-none"
               onChange={(e) => {
                 changeTag(e.target.value);
               }}
@@ -125,9 +125,9 @@ export default function TransactionList({ height }) {
               onChange={(e) => {
                 changeQuery(e.target.value);
               }}
-              className="flex-1 font-mono text-xs leading-none py-3 bg-transparent text-white focus:outline-none focus:text-blue-500 w-24"
+              className="flex-1 font-mono text-2xs leading-none py-3 bg-transparent text-white focus:outline-none focus:text-blue-500 w-24"
             />
-            <div className="font-mono text-xs mb-0.5 text-white pr-2">
+            <div className="font-mono text-2xs mb-0.5 text-white pr-2">
               <span
                 className={`whitespace-pre ${
                   net < 0 ? "text-red-500" : "text-green-500"
@@ -148,7 +148,7 @@ export default function TransactionList({ height }) {
                   width={width}
                   height={height}
                   rowCount={transactions.length}
-                  rowHeight={32}
+                  rowHeight={20}
                   rowRenderer={rowRenderer}
                   className="bg-grey-1000 focus:outline-none focus:border-blue-500"
                   overscanRowCount={100}

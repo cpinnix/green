@@ -10,7 +10,7 @@ export default function Navigation() {
       <div className={classes.layoutSpacer} />
       <select
         value={router.pathname}
-        className="bg-transparent appearance-none focus:outline-none cursor-pointer text-xs font-mono text-white"
+        className="bg-transparent appearance-none focus:outline-none cursor-pointer text-2xs font-mono text-white"
         onChange={(e) => {
           const nextPath = e.target.value;
           router.push(nextPath);
