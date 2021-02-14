@@ -10,9 +10,15 @@ const initialState = {
 
 export default createReducer(initialState, (builder) => {
   builder.addCase(fetchData.fulfilled, (state, action) => {
-    const { transactions, taggedExpressions, budgets } = action.payload;
+    const {
+      transactions,
+      taggedExpressions,
+      budgets,
+      accounts,
+    } = action.payload;
 
     state.budgets = budgets;
+    state.accounts = accounts;
 
     let expressions = taggedExpressions
       .map((taggedExpression) => {

@@ -32,6 +32,12 @@ export const budget = createSelector(budgets, (budgets) => {
   );
 });
 
+export const accounts = (state) => state.accounts;
+
+export const netWorth = createSelector(accounts, (accounts) =>
+  sumBy(accounts, ({ amount }) => amount)
+);
+
 export const filteredTransactions = createSelector(
   transactions,
   (transactions) => filterTransactions(transactions)

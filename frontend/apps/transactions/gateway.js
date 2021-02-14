@@ -71,3 +71,25 @@ export async function fetchBudgets() {
 
   return response?.data?.budgets;
 }
+
+export async function fetchAccounts() {
+  const endSpan = createSpan("`fetchBudgets`");
+
+  const response = await fetch("//localhost:4000", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      query: `
+          query {
+            accounts {
+              amount
+              name
+            }
+          }`,
+    }),
+  }).then((response) => response.json());
+
+  endSpan();
+
+  return response?.data?.accounts;
+}
