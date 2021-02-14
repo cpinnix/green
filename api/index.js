@@ -47,10 +47,16 @@ const typeDefs = gql`
     amount: Float
   }
 
+  type Account {
+    name: String
+    amount: Float
+  }
+
   type Query {
     transactions: [Transaction]
     taggedExpressions: [TaggedExpression]
     budgets: [Budget]
+    accounts: [Account]
   }
 `;
 
@@ -69,6 +75,13 @@ const resolvers = {
       const table = await parseCSV("../green-budget.csv");
       return table.map((row) => ({
         tag: row[0],
+        amount: row[1],
+      }));
+    },
+    accounts: async function () {
+      const table = await parseCSV("../green-accounts.csv");
+      return table.map((row) => ({
+        name: row[0],
         amount: row[1],
       }));
     },
