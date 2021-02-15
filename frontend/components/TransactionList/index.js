@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import PropTypes from "prop-types";
 import sum from "lodash/sum";
 import { List, AutoSizer } from "react-virtualized";
 import Fade from "react-reveal/Fade";
@@ -161,3 +162,7 @@ export default function TransactionList({ height }) {
     </Fade>
   );
 }
+
+TransactionList.propTypes = {
+  height: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+};

@@ -1,10 +1,10 @@
 import React, { useState } from "react";
+import PropTypes from "prop-types";
 import Fade from "react-reveal/Fade";
 import { useSelector } from "react-redux";
 import * as selectors from "apps/core/selectors";
 import getYear from "date-fns/getYear";
 import getMonth from "date-fns/getMonth";
-// import TransactionRow from "components/TransactionRow";
 import formatCurrency from "utils/formatCurrency";
 import classes from "./index.module.css";
 import { MONTH_OPTIONS } from "apps/transactions/constants";
@@ -19,6 +19,12 @@ function Accordion({ header, children, enabled }) {
     </div>
   );
 }
+
+Accordion.propTypes = {
+  header: PropTypes.node,
+  children: PropTypes.node,
+  enabled: PropTypes.bool,
+};
 
 export default function BudgetTable() {
   const loading = useSelector(selectors.loading);
@@ -133,28 +139,26 @@ export default function BudgetTable() {
                   }
                 >
                   <div className="bg-grey-900 max-h-96 overflow-scroll">
-                    {rows.map(
-                      ({ amount, tag, date, description, hash }, index) => (
-                        <div key={index} className={classes.transaction}>
-                          <div
-                            className={`font-mono text-2xs text-white whitespace-pre ${
-                              amount < 0 ? "text-red-500" : "text-green-500"
-                            }`}
-                          >
-                            {formatCurrency(amount)}
-                          </div>
-                          <div className="font-mono text-2xs text-white overflow-x-hidden whitespace-nowrap">
-                            {description}
-                          </div>
-                          <div className="font-mono text-2xs text-white">
-                            {formatDate(new Date(date), "MMM dd yyyy")}
-                          </div>
-                          <div className="font-mono text-2xs text-white">
-                            {hash}
-                          </div>
+                    {rows.map(({ amount, date, description, hash }, index) => (
+                      <div key={index} className={classes.transaction}>
+                        <div
+                          className={`font-mono text-2xs text-white whitespace-pre ${
+                            amount < 0 ? "text-red-500" : "text-green-500"
+                          }`}
+                        >
+                          {formatCurrency(amount)}
                         </div>
-                      )
-                    )}
+                        <div className="font-mono text-2xs text-white overflow-x-hidden whitespace-nowrap">
+                          {description}
+                        </div>
+                        <div className="font-mono text-2xs text-white">
+                          {formatDate(new Date(date), "MMM dd yyyy")}
+                        </div>
+                        <div className="font-mono text-2xs text-white">
+                          {hash}
+                        </div>
+                      </div>
+                    ))}
                   </div>
                 </Accordion>
               </div>

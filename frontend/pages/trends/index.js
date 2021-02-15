@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import PropTypes from "prop-types";
 import Head from "next/head";
 import toDate from "date-fns/toDate";
 import useInteractors from "hooks/useInteractors";
@@ -114,6 +115,19 @@ function Scatterplot({ tags, table, y, x }) {
     </div>
   );
 }
+
+Scatterplot.propTypes = {
+  tags: PropTypes.arrayOf(PropTypes.string),
+  table: PropTypes.arrayOf({
+    tag: PropTypes.string,
+  }),
+  y: PropTypes.shape({
+    domain: PropTypes.arrayOf(PropTypes.number),
+  }),
+  x: PropTypes.shape({
+    domain: PropTypes.arrayOf(PropTypes.date),
+  }),
+};
 
 export default function Page() {
   const interactors = useInteractors(() => createInteractors());

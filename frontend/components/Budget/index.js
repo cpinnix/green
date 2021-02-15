@@ -8,6 +8,7 @@ import ReactTooltip from "react-tooltip";
 import { SizeMe as Size } from "react-sizeme";
 import { useSelector } from "react-redux";
 import * as selectors from "apps/core/selectors";
+import PropTypes from "prop-types";
 
 export default function Budget({ height }) {
   const loading = useSelector(selectors.loading);
@@ -147,3 +148,7 @@ export default function Budget({ height }) {
     </Fade>
   );
 }
+
+Budget.propTypes = {
+  height: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+};
