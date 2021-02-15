@@ -1,0 +1,41 @@
+name: Lint
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+jobs:
+  frontend:
+    name: Lint FE
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: yarn
+        working-directory: frontend
+        run: yarn
+      - name: lint
+        working-directory: frontend
+        run: yarn lint
+  api:
+    name: Lint API
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: yarn
+        working-directory: api
+        run: yarn
+      - name: lint
+        working-directory: api
+        run: yarn lint
+  etl:
+    name: Lint ETL
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: yarn
+        working-directory: etl
+        run: yarn
+      - name: lint
+        working-directory: etl
+        run: yarn lint
