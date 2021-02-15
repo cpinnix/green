@@ -5,7 +5,8 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "start": "next start"
+    "start": "next start",
+    "lint": "eslint apps bones components hooks pages utils"
   },
   "dependencies": {
     "@next/bundle-analyzer": "^10.0.5",
@@ -32,7 +33,7 @@
     "tailwindcss": "^2.0.2"
   },
   "devDependencies": {
-    "eslint": "^7.16.0",
-    "eslint-plugin-react": "^7.21.5"
+    "eslint": "^7.20.0",
+    "eslint-plugin-react": "^7.22.0"
   }
 }

@@ -1,3 +1,5 @@
+/* global __dirname */
+
 const fs = require("fs");
 const parse = require("csv-parse");
 const stringify = require("csv-stringify");
@@ -103,7 +105,6 @@ Promise.all([
 
       if (!transformerForPath) {
         throw new Error(`No transformer found for: ${path}`);
-        return [];
       }
 
       return parseFile(transformers[transformerForPath], path);

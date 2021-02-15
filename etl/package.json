@@ -6,7 +6,8 @@
   "author": "Charles Pinnix <cpinnix89@gmail.com>",
   "license": "MIT",
   "scripts": {
-    "load": "node cmd/load"
+    "load": "node cmd/load",
+    "lint": "eslint transformers utils cmd"
   },
   "dependencies": {
     "csv-parse": "^4.14.2",
@@ -14,5 +15,8 @@
     "lodash": "^4.17.20",
     "moment": "^2.29.1",
     "winston": "^3.3.3"
+  },
+  "devDependencies": {
+    "eslint": "^7.20.0"
   }
 }

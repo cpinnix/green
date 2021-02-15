@@ -1,4 +1,5 @@
 import React from "react";
+import PropTypes from "prop-types";
 import Fade from "react-reveal/Fade";
 import { useSelector } from "react-redux";
 import * as selectors from "apps/core/selectors";
@@ -39,3 +40,7 @@ export default function NetWorth({ height }) {
     </Fade>
   );
 }
+
+NetWorth.propTypes = {
+  height: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+};

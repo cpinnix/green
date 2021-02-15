@@ -81,7 +81,7 @@ function defaults(object, defs) {
   defs = defs || {};
   // Iterate over object non-prototype properties:
   for (key in defs) {
-    if (defs.hasOwnProperty(key)) {
+    if (Object.prototype.hasOwnProperty.call(defs, key)) {
       // Replace values with defaults only if undefined (allow empty/zero values):
       if (object[key] == null) object[key] = defs[key];
     }
@@ -375,7 +375,7 @@ lib.formatColumn = function (
     // Store value for the length of the longest string in the column:
     maxLength = 0,
     // Format the list according to options, store the length of the longest string:
-    formatted = map(list, function (val, i) {
+    formatted = map(list, function (val) {
       if (isArray(val)) {
         // Recursively format columns if list is a multi-dimensional array:
         return lib.formatColumn(val, opts);
@@ -405,7 +405,7 @@ lib.formatColumn = function (
     });
 
   // Pad each number in the list and send back the column of numbers:
-  return map(formatted, function (val, i) {
+  return map(formatted, function (val) {
     // Only if this is a string (not a nested array, which would have already been padded):
     if (isString(val) && val.length < maxLength) {
       // Depending on symbol position, pad after symbol or at index 0:

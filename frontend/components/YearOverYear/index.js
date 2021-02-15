@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import PropTypes from "prop-types";
 import Fade from "react-reveal/Fade";
 import getYear from "date-fns/getYear";
 import { useSelector } from "react-redux";
@@ -72,3 +73,7 @@ export default function YearOverYear({ height }) {
     </Fade>
   );
 }
+
+YearOverYear.propTypes = {
+  height: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+};

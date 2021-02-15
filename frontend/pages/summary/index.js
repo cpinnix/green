@@ -1,4 +1,5 @@
 import React, { useEffect, useState, Profiler } from "react";
+import PropTypes from "prop-types";
 import Head from "next/head";
 import Fade from "react-reveal/Fade";
 import useInteractors from "hooks/useInteractors";
@@ -67,6 +68,12 @@ function Accordion({ header, children, enabled }) {
     </div>
   );
 }
+
+Accordion.propTypes = {
+  header: PropTypes.node,
+  children: PropTypes.node,
+  enabled: PropTypes.bool,
+};
 
 export default function SummaryPage() {
   const interactors = useInteractors(() => createInteractors());
