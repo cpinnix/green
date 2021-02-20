@@ -1,0 +1,11 @@
+{
+  "devDependencies": {
+    "husky": "^5.0.9",
+    "prettier": "^2.2.1",
+    "pretty-quick": "^3.1.0"
+  },
+  "scripts": {
+    "postinstall": "husky install",
+    "format": "prettier \"api/.*.js\" \"api/*.js\" \"etl/.*.js\" \"etl/*.js\" \"etl/(utils|transformers|cmd)/**/*.js\" \"etl/(utils|transformers|cmd)/**/*.js\" \"frontend/.*.js\" \"frontend/*.js\" \"frontend/(apps|bones|components|hooks|pages|utils)/**/*.js\" --write"
+  }
+}
