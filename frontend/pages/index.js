@@ -1,23 +1,27 @@
-import React, { useEffect } from "react";
+import React from "react";
 import Head from "next/head";
 import Navigation from "components/Navigation";
-import core from "apps/core";
-import * as actions from "apps/core/actions";
+import YearOverYear from "components/YearOverYear";
 import TransactionList from "components/TransactionList";
+import BudgetTable from "components/BudgetTable";
+import NetWorth from "components/NetWorth";
 
-export default function Page() {
-  useEffect(() => {
-    core.dispatch(actions.fetchData());
-  }, []);
-
+export default function DashboardPage() {
   return (
-    <div className="h-screen flex flex-col">
+    <div>
       <Head>
-        <title>Transactions</title>
+        <title>Dashboard</title>
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <Navigation />
-      <TransactionList height="100%" />
+      <div className="px-8 space-y-8 mb-8">
+        <div className="grid grid-cols-3 gap-8 items-stretch">
+          <NetWorth height="100%" />
+          <YearOverYear height="100%" />
+        </div>
+        <BudgetTable />
+        <TransactionList height={800} />
+      </div>
     </div>
   );
 }
